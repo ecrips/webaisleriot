@@ -1,0 +1,81 @@
+<html>
+<head>
+<style>
+body {
+	background-image: url(baize.png);
+	margin: 0px;
+}
+.card {
+	position: absolute;
+	display: block;
+	height: 123px;
+	width: 79px;
+	background-image: url(bonded.png);
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+}
+.slot {
+	position: absolute;
+	display: block;
+	height: 123px;
+	width: 79px;
+	background-repeat: no-repeat;
+	background-image: url(slot.png);
+	background-position: 2px 2px;
+}
+.title {
+	color: white;
+	font-size: 150%;
+	margin-bottom: 1em;
+}
+#container {
+	position: relative;
+}
+#status {
+	background-color: gray;
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+	left: 0px;
+}
+#toolbar {
+	background-color: grey;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+}
+#deal {
+	display: none;
+}
+#undo {
+	display: none;
+}
+#redo {
+	display: none;
+}
+#options {
+	text-align: center;
+}
+#highlight {
+	position: relative;
+	display: none;
+	opacity: 0.5;
+	background-color: yellow;
+}
+</style>
+<script src="aisleriot.js"></script>
+</head>
+<body>
+<div id="debug" style="background-color: white;"></div><!--
+--><div id="toolbar">
+<span id="deal"><a href="#" onClick="return doDeal()">Deal</a></span>
+<span id="undo"><a href="#" onClick="return doUndo()">Undo</a></span>
+<span id="redo"><a href="#" onClick="return doRedo()">Redo</a></span>
+</div>
+<div id="container">
+<div id="highlight"></div>
+</div>
+<div id="options"></div>
+<div id="status">Loading...</div>
+</body>
+</html>
