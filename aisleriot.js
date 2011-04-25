@@ -335,7 +335,9 @@ function buttonPressed(e, card, slotid, position)
 				slot[slotid].scmCards = oldCards;
 			}
 		}
+		return false;
 	}
+	return true;
 }
 
 function makeCard(details, slotid, position)
@@ -343,12 +345,10 @@ function makeCard(details, slotid, position)
 	var e = document.createElement("span");
 
 	e.onmousedown = function(ev) {
-		buttonPressed(ev, e, slotid, position);
-		return false;
+		return buttonPressed(ev, e, slotid, position);
 	}
 	e.ontouchstart = function(ev) {
-		buttonPressed(ev, e, slotid, position);
-		return false;
+		return buttonPressed(ev, e, slotid, position);
 	}
 	e.onclick = function(env) {
 		gameFunctions[funcButtonClicked](mainenv,
