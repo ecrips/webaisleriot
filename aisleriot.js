@@ -895,7 +895,8 @@ var mainenv = {
 		var func = scm_apply(env, args[0]);
 		setTimeout(function() {
 			func(env, []);
-		}, 250);
+			testGameOver();
+		}, 100);
 	},
 
 	"load-file": function(env, args) {
