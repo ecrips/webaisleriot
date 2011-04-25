@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>Web Aisleriot</title>
 <style>
 body {
 	background-image: url(baize.png);
@@ -24,7 +25,6 @@ body {
 	background-position: 2px 2px;
 }
 .title {
-	color: white;
 	font-size: 150%;
 	margin-bottom: 1em;
 }
@@ -39,6 +39,7 @@ body {
 	left: 0px;
 }
 #toolbar {
+	display: none;
 	background-color: grey;
 	left: 0px;
 	right: 0px;
@@ -53,8 +54,11 @@ body {
 #redo {
 	display: none;
 }
+#hint {
+}
 #options {
 	text-align: center;
+	color: white;
 }
 #highlight {
 	position: relative;
@@ -71,6 +75,7 @@ body {
 <span id="deal"><a href="#" onClick="return doDeal()">Deal</a></span>
 <span id="undo"><a href="#" onClick="return doUndo()">Undo</a></span>
 <span id="redo"><a href="#" onClick="return doRedo()">Redo</a></span>
+<span id="hint"><a href="#" onClick="return doHint()">Hint</a></span>
 </div>
 <div id="container">
 <div id="highlight"></div>

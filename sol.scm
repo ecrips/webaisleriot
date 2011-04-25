@@ -14,7 +14,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;(use-modules (ice-9 format))
+(use-modules (ice-9 format))
 
 ;; Compatibility code so we run on both guile 1.3 and 1.5
 
@@ -87,9 +87,9 @@
 ; Use this instead of define for variables which determine the state of
 ; the game. i.e. anything that isn't a constant. This is so undo/redo
 ; is transparent. It should behave otherwise identically to define.
-;(defmacro def-save-var (nm value)
-;  `(begin (define ,nm ,value)
-;          (set! variable-list (cons ',nm variable-list))))
+(defmacro def-save-var (nm value)
+  `(begin (define ,nm ,value)
+          (set! variable-list (cons ',nm variable-list))))
 
 ; create a 52 card deck (puts list of cards into DECK)
 (define (make-standard-deck)

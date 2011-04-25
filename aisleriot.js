@@ -43,11 +43,16 @@ var cardHeight = 123;
 var container;
 var highlight;
 
+function truth(val)
+{
+	return (val !== false);
+}
+
 function updateFeatures(newFeatures)
 {
 	features = newFeatures;
 	document.getElementById("deal").style.display =
-		(features & 4)?"block":"none";
+		(features & 4)?"inline":"none";
 }
 
 var slotLayout =
@@ -92,7 +97,7 @@ function Slot(param,slotid)
 	this.position = param[1];
 	this.cards = [];
 	this.scmCards = [];
-	this.yExpansion = 0.1;
+	this.yExpansion = 0.2;
 	this.slotid = slotid;
 
 	var e = document.createElement("span");
@@ -146,9 +151,9 @@ function hideHighlight()
 
 function testGameOver()
 {
-	var ret = !gameFunctions[funcGameOver](mainenv, []);
+	var ret = !truth(gameFunctions[funcGameOver](mainenv, []));
 	if (ret) {
-		if (gameFunctions[funcGameWon](mainenv, [])) {
+		if (truth(gameFunctions[funcGameWon](mainenv, []))) {
 			alert("You won!");
 		} else {
 			alert("You lost!");
@@ -159,11 +164,30 @@ function testGameOver()
 function doUndo()
 {
 	scm_apply(mainenv, ["undo"]);
+	return true;
 }
 
 function doRedo()
 {
 	scm_apply(mainenv, ["redo"]);
+	return true;
+}
+
+function doHint()
+{
+	var hint = gameFunctions[funcGetHint](mainenv, []);
+
+	if (!truth(hint[0])) {
+		alert("This game does not have hint support");
+	} else if (hint[0] == 0) {
+		alert(hint[1]);
+	} else if (hint[0] == 1 || hint[0] == 2) {
+		alert("Move "+hint[1]+" onto "+hint[2]);
+	} else {
+		d(hint);
+	}
+
+	return true;
 }
 
 function buttonPressed(e, card, slotid, position)
@@ -174,7 +198,7 @@ function buttonPressed(e, card, slotid, position)
 	var pickup = gameFunctions[funcButtonPressed](mainenv,
 		[["quote",slotid], ["quote",scmCardlist]]);
 
-	if (pickup) {
+	if (truth(pickup)) {
 		var startX = parseInt(card.style.left);
 		var startY = parseInt(card.style.top);
 
@@ -194,8 +218,8 @@ function buttonPressed(e, card, slotid, position)
 			cardlist[i].style.zIndex = 1000;
 		}
 
-		document.ontouchmove =
-		document.onmousemove = function(e) {
+		container.ontouchmove =
+		container.onmousemove = function(e) {
 			if (e.touches) e=e.targetTouches[0];
 
 			for(var i in cardlist) {
@@ -205,7 +229,10 @@ function buttonPressed(e, card, slotid, position)
 					e.clientY + offsetY + offsets[i][1];
 			}
 
-			var theSlot = findSlot(e.clientX, e.clientY);
+			var x = e.clientX - container.offsetLeft;
+			var y = e.clientY - container.offsetTop;
+
+			var theSlot = findSlot(x, y);
 			if (!theSlot) {
 				hideHighlight();
 				return;
@@ -214,20 +241,20 @@ function buttonPressed(e, card, slotid, position)
 					[["quote",slotid],
 					 ["quote",scmCardlist],
 					 ["quote",theSlot.slotid]]);
-			if (droppable) {
+			if (truth(droppable)) {
 				showHighlight(theSlot);
 			} else {
 				hideHighlight();
 			}
 		}
-		document.ontouchend =
-		document.onmouseup = function(e) {
+		container.ontouchend =
+		container.onmouseup = function(e) {
 			if (e.touches) e=e.changedTouches[0];
 
-			document.ontouchmove =
-				document.ontouchend =
-				document.onmousemove =
-				document.onmouseup = null;
+			container.ontouchmove =
+				container.ontouchend =
+				container.onmousemove =
+				container.onmouseup = null;
 
 			hideHighlight();
 
@@ -239,7 +266,10 @@ function buttonPressed(e, card, slotid, position)
 				cardlist[i].style.zIndex = oldzIndex[i];
 			}
 
-			var theSlot = findSlot(e.clientX, e.clientY);
+			var x = e.clientX - container.offsetLeft;
+			var y = e.clientY - container.offsetTop;
+
+			var theSlot = findSlot(x, y);
 			if (!theSlot) return;
 
 			var oldCards = slot[slotid].scmCards;
@@ -255,9 +285,10 @@ function buttonPressed(e, card, slotid, position)
 				 ["quote",scmCardlist],
 				 ["quote",theSlot.slotid]]);
 
-			if (ret) {
+			if (truth(ret)) {
 				scm_apply(mainenv, ["end-move"]);
 				testGameOver();
+				updateSlot(slotid, slot[slotid].scmCards);
 			} else {
 				scm_apply(mainenv, ["discard-move"]);
 				slot[slotid].scmCards = oldCards;
@@ -325,6 +356,20 @@ function updateSlot(slotid, cards)
 		theSlot.cards[i] = makeCard(cards[i], slotid, i);
 	}
 	layoutSlot(slotid);
+}
+
+function listReplace(inlist, item, replaceWith)
+{
+	var list = inlist.slice(0);
+	for(var i in list) {
+		var e = list[i];
+		if (typeof(e) == "object") {
+			list[i] = listReplace(list[i], item, replaceWith);
+		} else if (e == item) {
+			list[i] = replaceWith;
+		}
+	}
+	return list;
 }
 
 var mainenv = {
@@ -401,6 +446,44 @@ var mainenv = {
 		}
 		return out;
 	},
+	"/": function(env, args) {
+		args = scm_eval(env, args);
+		var out = parseFloat(args[0]);
+		for(var i = 1; i < args.length; i++) {
+			out /= parseFloat(args[i]);
+		}
+		return out;
+	},
+	"quotient": function(env, args) {
+		args = scm_eval(env, args);
+		var out = parseInt(args[0]);
+		for(var i = 1; i < args.length; i++) {
+			out /= parseInt(args[i]);
+		}
+		return out;
+	},
+	"max": function(env, args) {
+		args = scm_eval(env, args);
+		var out = parseInt(args[0]);
+		for(var i = 1; i < args.length; i++) {
+			var num = parseInt(args[i])
+			if (num > out) out = num;
+		}
+		return out;
+	},
+	"min": function(env, args) {
+		args = scm_eval(env, args);
+		var out = parseInt(args[0]);
+		for(var i = 1; i < args.length; i++) {
+			var num = parseInt(args[i])
+			if (num < out) out = num;
+		}
+		return out;
+	},
+	"expt": function(env, args) {
+		args = scm_eval(env, args);
+		return Math.pow(parseInt(args[0]), parseInt(args[1]));
+	},
 	"=": function(env, args) {
 		args = scm_eval(env, args);
 		var ret = (parseInt(args[0]) == parseInt(args[1]));
@@ -416,31 +499,47 @@ var mainenv = {
 		var ret = (parseInt(args[0]) >= parseInt(args[1]));
 		return ret;
 	},
+	"<=": function(env, args) {
+		args = scm_eval(env, args);
+		var ret = (parseInt(args[0]) <= parseInt(args[1]));
+		return ret;
+	},
+	"<": function(env, args) {
+		args = scm_eval(env, args);
+		var ret = (parseInt(args[0]) < parseInt(args[1]));
+		return ret;
+	},
+	"string<?": function(env, args) {
+		args = scm_eval(env, args);
+		var ret = (args[0] < args[1]);
+		return ret;
+	},
 	"not": function(env, args) {
 		var value = scm_apply(env, args[0]);
-		return !value;
+		return !truth(value);
 	},
 	"and": function(env, args) {
+		var val;
 		for(var i in args) {
-			var val = scm_apply(env, args[i]);
-			if (val != undefined && !val) {
+			val = scm_apply(env, args[i]);
+			if (!truth(val)) {
 				return false;
 			}
 		}
-		return true;
+		return val;
 	},
 	"or": function(env, args) {
 		for(var i in args) {
 			var val = scm_apply(env, args[i]);
-			if (val) {
-				return true;
+			if (truth(val)) {
+				return val;
 			}
 		}
 		return false;
 	},
 	"eq?": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (args[0] == args[1]);
+		var ret = (args[0] === args[1]);
 		return ret;
 	},
 	"equal?": function(env, args) {
@@ -471,7 +570,7 @@ var mainenv = {
 	},
 	"if": function(env, args) {
 		var cond = scm_apply(env, args[0]);
-		if (cond) {
+		if (truth(cond)) {
 			return scm_apply(env, args[1]);
 		}
 		if (args[2] != null) {
@@ -481,10 +580,40 @@ var mainenv = {
 	"cond": function(env, args) {
 		for(var i in args) {
 			var cond = scm_apply(env, args[i][0]);
-			if (cond) {
+			if (truth(cond)) {
 				return scm_eval(env, args[i].slice(1)).pop();
 			}
 		}
+	},
+	"do": function(env, args) {
+		var newenv = {__parent: env};
+
+		var variables = args[0];
+		var test = args[1];
+		var stmts = args.slice(2);
+
+		// Init phase
+		for(var i in variables) {
+			var v = variables[i];
+			newenv[v[0]] = scm_apply(env, v[1]);
+		}
+		var testval = scm_apply(newenv, test[0]);
+		while (!truth(testval)) {
+			scm_eval(newenv, stmts);
+
+			var oldenv = newenv;
+			newenv = {__parent: env};
+
+			// Step variables
+			for(var i in variables) {
+				var v = variables[i];
+				if (v[2])
+					newenv[v[0]] = scm_apply(oldenv, v[2]);
+			}
+
+			testval = scm_apply(newenv, test[0]);
+		}
+		return scm_eval(newenv, test.slice(1)).pop();
 	},
 	"cons": function(env, args) {
 		var left = scm_apply(env, args[0]);
@@ -494,6 +623,10 @@ var mainenv = {
 	"list": function(env, args) {
 		var ret = scm_eval(env, args);
 		return ret;
+	},
+	"list?": function(env, args) {
+		var val = scm_apply(env, args[0]);
+		return (typeof(val) == "object");
 	},
 	"let": function(env, args) {
 		var newenv = {__parent: env};
@@ -518,9 +651,6 @@ var mainenv = {
 		}
 		
 		return scm_eval(newenv, stmts).pop();
-	},
-	"list->vector": function(env, args) {
-		return scm_apply(env, args[0]);
 	},
 	"vector-length": function(env, args) {
 		var vector = scm_apply(env, args[0]);
@@ -550,13 +680,37 @@ var mainenv = {
 		var list = scm_apply(env, args[0]);
 		return list.slice(1);
 	},
+	"caar": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[0][0];
+	},
 	"cadr": function(env, args) {
 		var list = scm_apply(env, args[0]);
 		return list[1];
 	},
+	"cdar": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[0].slice(1);
+	},
+	"caaar": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[0][0][0];
+	},
 	"caddr": function(env, args) {
 		var list = scm_apply(env, args[0]);
 		return list[2];
+	},
+	"cadar": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[0][1];
+	},
+	"cadddr": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[3];
+	},
+	"cdaar": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		return list[0][0].slice(1);
 	},
 	"map": function(env, args) {
 		if (args.length > 2) {
@@ -567,7 +721,7 @@ var mainenv = {
 		var list = scm_apply(env, args[1]);
 		var output = [];
 		for(var i in list) {
-			output.push(env,func(env, [list[i]]));
+			output.push(func(env, [list[i]]));
 		}
 		return output;
 	},
@@ -582,6 +736,11 @@ var mainenv = {
 		var list = scm_apply(env, args[0]);
 		// Javascript's reverse affects the original array!
 		return list.slice(0).reverse();
+	},
+	"list-ref": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		var pos = scm_apply(env, args[1]);
+		return list[pos];
 	},
 	"list-tail": function(env, args) {
 		var list = scm_apply(env, args[0]);
@@ -613,6 +772,55 @@ var mainenv = {
 	"display": function(env, args) {
 		var text = scm_eval(env, args);
 		d(text);
+	},
+	"defmacro": function(env, args) {
+		var name = args[0];
+		var params = args[1];
+		var body = args[2];
+
+		env[name] = function(argsenv, args) {
+			var realBody = body;
+			for(var i in params) {
+				realBody = listReplace(realBody,
+					","+params[i], args[i]);
+			}
+			return scm_eval(argsenv, realBody).pop();
+		};
+	},
+	"make-hash-table": function(env, args) {
+		return {};
+	},
+	"hash-ref": function(env, args) {
+		var table = scm_apply(env, args[0]);
+		var key = scm_apply(env, args[1]);
+		var def = false;
+		if (args.length == 3) def = scm_apply(env, args[2]);
+
+		var ret = table[key];
+		if (ret === undefined) {
+			return def;
+		}
+		return ret;
+	},
+	"hash-set!": function(env, args) {
+		var table = scm_apply(env, args[0]);
+		var key = scm_apply(env, args[1]);
+		var val = scm_apply(env, args[2]);
+
+		table[key] = val;
+	},
+	"eval": function(env, args) {
+		return scm_eval(env, args).pop();
+	},
+	"sort": function(env, args) {
+		var items = scm_apply(env, args[0]);
+		var less = scm_apply(env, args[1]);
+
+		var items = items.slice(0);
+		items.sort(function(b,a) {
+			return less(env, [["quote",a],["quote",b]]);
+		});
+		return items;
 	},
 
 	"set-lambda": function(env, args) {
@@ -676,12 +884,18 @@ var mainenv = {
 	"undo-set-sensitive": function(env, args) {
 		var undo = document.getElementById("undo");
 		var state = scm_apply(env, args[0]);
-		undo.style.display = state?"block":"none";
+		undo.style.display = state?"inline":"none";
 	},
 	"redo-set-sensitive": function(env, args) {
 		var redo = document.getElementById("redo");
 		var state = scm_apply(env, args[0]);
-		redo.style.display = state?"block":"none";
+		redo.style.display = state?"inline":"none";
+	},
+	"delayed-call": function(env, args) {
+		var func = scm_apply(env, args[0]);
+		setTimeout(function() {
+			func(env, []);
+		}, 250);
 	},
 
 	"load-file": function(env, args) {
@@ -752,12 +966,19 @@ function parse(text)
 			curlist.push(newList);
 			curlist = newList;
 		} else if (ch == '(') {
+			if (cursymbol == "`") {
+				// Ignore it - we're a bit dodgy with macros
+			} else if (cursymbol == "#") {
+				// Pretend it was a quoting symbol
+				var tmpList = ["quote"];
+				curlist.push(tmpList);
+				curlist = tmpList;
+			} else if (cursymbol != "") {
+				d("Parse error:"+cursymbol);
+			}
 			var newList = [];
 			curlist.push(newList);
 			stack.push(newList);
-			if (cursymbol != "") {
-				d("Parse error:"+cursymbol);
-			}
 			cursymbol = '';
 			curlist = newList;
 		} else if (ch == ')') {
@@ -844,11 +1065,35 @@ function makeTitle(text)
 	return e;
 }
 
+function startGame(options)
+{
+	var optionDiv = document.getElementById("options");
+
+	if (options) {
+		for(var i in options) {
+			var op = options[i];
+			op[1] = op.check.checked;
+		}
+		gameFunctions[funcApplyOptions](mainenv, [["quote",options]]);
+	}
+
+	document.getElementById("toolbar").style.display="block";
+
+	optionDiv.style.display = "none";
+	gameFunctions[funcNewGame](mainenv,[]);
+	scm_apply(mainenv, ["start-game"]);
+	gameFunctions[funcGameOver](mainenv,[]);
+}
+
 function doOptions(env, args)
 {
 	var name = scm_apply(env, args[0]);
-	var options = gameFunctions[funcGetOptions]();
+	var options = gameFunctions[funcGetOptions](mainenv, []);
 	var optionDiv = document.getElementById("options");
+
+	if (!options) {
+		startGame();
+	}
 
 	while (optionDiv.hasChildNodes()) {
 		optionDiv.removeChild(optionDiv.firstChild);
@@ -864,22 +1109,19 @@ function doOptions(env, args)
 		d.appendChild(text);
 		var value = document.createElement("input");
 		value.type = "checkbox";
-		value.checked = op[1];
+		value.checked = truth(op[1]);
 		d.appendChild(value);
 
 		optionDiv.appendChild(d);
+
+		op.check = value;
 	}
 
 	optionDiv.appendChild(document.createElement("p"));
 
 	e = document.createElement("button");
 	e.textContent = "Start";
-	e.onclick = function() {
-		optionDiv.style.display = "none";
-		gameFunctions[funcNewGame](mainenv,[]);
-		scm_apply(mainenv, ["start-game"]);
-		gameFunctions[funcGameOver](mainenv,[]);
-	}
+	e.onclick = function() {startGame(options);};
 	optionDiv.appendChild(e);
 }
 
@@ -902,11 +1144,11 @@ function chooseGame()
 
 		e = document.createElement("button");
 		e.textContent = niceName;
-		e.onclick = function() {
+		e.onclick = function(name,niceName) {return function() {
 			scm_apply(mainenv, ["__game-options",
 				["quote",name],
 				["quote",niceName]]);
-		}
+		}}(name,niceName);
 
 		optionDiv.appendChild(e);
 	}
