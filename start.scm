@@ -32,11 +32,7 @@
 ; These are just getting stupidly long
 (define (cdaadr x) (cdaar (cdr x)))
 
-;(load-file "sol.scm")
-;(load-file "ten_across.scm")
-
-(define __game-list '(ten_across freecell))
-;(define __game-list '(ten_across))
+(define __game-list '(ten_across freecell klondike thirteen))
 (set-statusbar-message "Select a game")
 
 (define (__game-options name nice-name)
@@ -47,28 +43,3 @@
 	((javascript "doOptions") nice-name)
 )
 
-;(define d set-statusbar-message)
-;
-;(define (make-card a b) (list a b))
-;
-;(define (test value suit)
-;	(make-card value suit))
-;
-;(d (test 'test 'bob))
-
-;(d
-;(let ((x 2) (y 3))
-;  (let* ((x 7)
-;         (z (+ x y)))
-;    (* z x)))
-;) ; ==> 70
-;(d
-;
-;(let ((x 2) (y 3))
-;  (let ((x 7)
-;        (z (+ x y)))
-;    (* z x)))
-;) ; ==> 35
-
-;(d (cons 1 (cons 2 (cons 3 4))))
-;(d (list 1 2 3 4))

@@ -26,6 +26,7 @@ var funcGetOptions = 8;
 var funcApplyOptions = 9;
 var funcTimeout = 10;
 var funcDroppable = 11;
+var funcDealable = 12;
 
 var gameFunctions;
 
@@ -43,6 +44,8 @@ var cardHeight = 123;
 var container;
 var highlight;
 
+var startGameLambda;
+
 function truth(val)
 {
 	return (val !== false);
@@ -52,7 +55,7 @@ function updateFeatures(newFeatures)
 {
 	features = newFeatures;
 	document.getElementById("deal").style.display =
-		(features & 4)?"inline":"none";
+		(features & 4)?"inline-block":"none";
 }
 
 var slotLayout =
@@ -89,6 +92,21 @@ var slotLayout =
 		}
 		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
 	},
+	// Horizontal list
+	"expanded-right":function(slot) {
+		var x = slot.position[0] * spacingX;
+		var y = slot.position[1] * spacingY;
+		slot.size = [x,y];
+		var expand_size = slot.xExpansion*spacingX;
+
+		for(var i = slot.cards.length - 1; i>=0; i--) {
+			var c = slot.cards[i];
+			c.style.left = x;
+			c.style.top = y;
+			x += expand_size;
+		}
+		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
+	}
 }
 
 function Slot(param,slotid)
@@ -98,6 +116,7 @@ function Slot(param,slotid)
 	this.cards = [];
 	this.scmCards = [];
 	this.yExpansion = 0.2;
+	this.xExpansion = 0.2;
 	this.slotid = slotid;
 
 	var e = document.createElement("span");
@@ -161,16 +180,23 @@ function testGameOver()
 	}
 }
 
+function doNewGame()
+{
+	if (confirm("Start new game?")) {
+		startGameLambda();
+	}
+}
+
 function doUndo()
 {
 	scm_apply(mainenv, ["undo"]);
-	return true;
+	return false;
 }
 
 function doRedo()
 {
 	scm_apply(mainenv, ["redo"]);
-	return true;
+	return false;
 }
 
 function doHint()
@@ -187,7 +213,18 @@ function doHint()
 		d(hint);
 	}
 
-	return true;
+	return false;
+}
+
+function doDeal()
+{
+	scm_apply(mainenv, ["record-move",
+			["quote",-1],
+			["quote",[]]]);
+	scm_apply(mainenv, ["do-deal-next-cards"]);
+	scm_apply(mainenv, ["end-move"]);
+	testGameOver();
+	return false;
 }
 
 function buttonPressed(e, card, slotid, position)
@@ -426,15 +463,15 @@ var mainenv = {
 		args = scm_eval(env, args);
 		var out = 0;
 		for(var i in args) {
-			out += parseInt(args[i]);
+			out += args[i];
 		}
 		return out;
 	},
 	"-": function(env, args) {
 		args = scm_eval(env, args);
-		var out = parseInt(args[0]);
+		var out = args[0];
 		for(var i = 1; i < args.length; i++) {
-			out -= parseInt(args[i]);
+			out -= args[i];
 		}
 		return out;
 	},
@@ -442,15 +479,15 @@ var mainenv = {
 		args = scm_eval(env, args);
 		var out = 1;
 		for(var i in args) {
-			out *= parseInt(args[i]);
+			out *= args[i];
 		}
 		return out;
 	},
 	"/": function(env, args) {
 		args = scm_eval(env, args);
-		var out = parseFloat(args[0]);
+		var out = args[0];
 		for(var i = 1; i < args.length; i++) {
-			out /= parseFloat(args[i]);
+			out /= args[i];
 		}
 		return out;
 	},
@@ -633,6 +670,24 @@ var mainenv = {
 		var assignments = args[0];
 		var stmts = args.slice(1);
 
+		if (typeof(assignments) == "string") {
+			// Looping let
+			var name = assignments;
+
+			assignments = stmts[0];
+			stmts = stmts.slice(1);
+
+			newenv[name] = function(argsenv, args) {
+				args = scm_eval(argsenv, args);
+				for(var i=0; i<assignments.length; i++) {
+					var ass = assignments[i];
+					newenv[ass[0]] = args[i];
+				}
+				
+				return scm_eval(newenv, stmts).pop();
+			}
+		}
+
 		for(var i=0; i<assignments.length; i++) {
 			var ass = assignments[i];
 			newenv[ass[0]] = scm_apply(env, ass[1]);
@@ -765,6 +820,18 @@ var mainenv = {
 		}
 		return output;
 	},
+	"string-append": function(env, args) {
+		var strs = scm_eval(env, args);
+		var output = "";
+		for(var i in strs) {
+			output += strs[i];
+		}
+		return output;
+	},
+	"number->string": function(env, args) {
+		var num = scm_eval(env, args);
+		return num+"";
+	},
 
 	"#f": false,
 	"#t": true,
@@ -884,12 +951,12 @@ var mainenv = {
 	"undo-set-sensitive": function(env, args) {
 		var undo = document.getElementById("undo");
 		var state = scm_apply(env, args[0]);
-		undo.style.display = state?"inline":"none";
+		undo.style.display = state?"inline-block":"none";
 	},
 	"redo-set-sensitive": function(env, args) {
 		var redo = document.getElementById("redo");
 		var state = scm_apply(env, args[0]);
-		redo.style.display = state?"inline":"none";
+		redo.style.display = state?"inline-block":"none";
 	},
 	"delayed-call": function(env, args) {
 		var func = scm_apply(env, args[0]);
@@ -975,7 +1042,7 @@ function parse(text)
 				curlist.push(tmpList);
 				curlist = tmpList;
 			} else if (cursymbol != "") {
-				d("Parse error:"+cursymbol);
+				push_symbol();
 			}
 			var newList = [];
 			curlist.push(newList);
@@ -1073,7 +1140,9 @@ function startGame(options)
 	if (options) {
 		for(var i in options) {
 			var op = options[i];
-			op[1] = op.check.checked;
+			if (op.length == 2) {
+				op[1] = op.check.checked;
+			}
 		}
 		gameFunctions[funcApplyOptions](mainenv, [["quote",options]]);
 	}
@@ -1104,6 +1173,10 @@ function doOptions(env, args)
 
 	for(var i in options) {
 		var op = options[i];
+		if (op == "begin-exclusive" || op == "end-exclusive") {
+			/* TODO: exclusive options */
+			continue;
+		}
 		var d = document.createElement("div");
 		var text = document.createElement("span");
 		text.textContent = op[0];
@@ -1122,7 +1195,8 @@ function doOptions(env, args)
 
 	e = document.createElement("button");
 	e.textContent = "Start";
-	e.onclick = function() {startGame(options);};
+	startGameLambda = function() {startGame(options);}
+	e.onclick = startGameLambda;
 	optionDiv.appendChild(e);
 }
 

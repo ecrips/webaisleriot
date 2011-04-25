@@ -44,17 +44,37 @@ body {
 	left: 0px;
 	right: 0px;
 	top: 0px;
+	height: 32px;
 }
 #deal {
 	display: none;
+	background-image: url(deal.png);
+	width: 32px;
+	height: 32px;
 }
 #undo {
 	display: none;
+	background-image: url(undo.png);
+	width: 32px;
+	height: 32px;
 }
 #redo {
 	display: none;
+	background-image: url(redo.png);
+	width: 32px;
+	height: 32px;
 }
 #hint {
+	display: inline-block;
+	background-image: url(info.png);
+	width: 32px;
+	height: 32px;
+}
+#newgame {
+	display: inline-block;
+	background-image: url(new.png);
+	width: 32px;
+	height: 32px;
 }
 #options {
 	text-align: center;
@@ -72,10 +92,11 @@ body {
 <body>
 <div id="debug" style="background-color: white;"></div><!--
 --><div id="toolbar">
-<span id="deal"><a href="#" onClick="return doDeal()">Deal</a></span>
-<span id="undo"><a href="#" onClick="return doUndo()">Undo</a></span>
-<span id="redo"><a href="#" onClick="return doRedo()">Redo</a></span>
-<span id="hint"><a href="#" onClick="return doHint()">Hint</a></span>
+<div id="newgame" onClick="return doNewGame()"></div>
+<div id="deal" onClick="return doDeal()"></div>
+<div id="undo" onClick="return doUndo()"></div>
+<div id="redo" onClick="return doRedo()"></div>
+<div id="hint" onClick="return doHint()"></div>
 </div>
 <div id="container">
 <div id="highlight"></div>
