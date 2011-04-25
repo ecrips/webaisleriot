@@ -218,6 +218,10 @@ function doHint()
 
 function doDeal()
 {
+	if (!truth(gameFunctions[funcDealable])) {
+		alert("Deal is not available at this time");
+		return;
+	}
 	scm_apply(mainenv, ["record-move",
 			["quote",-1],
 			["quote",[]]]);
@@ -344,6 +348,11 @@ function makeCard(details, slotid, position)
 	}
 	e.ontouchstart = function(ev) {
 		buttonPressed(ev, e, slotid, position);
+		return false;
+	}
+	e.onclick = function(env) {
+		gameFunctions[funcButtonClicked](mainenv,
+			[["quote", slotid]]);
 		return false;
 	}
 
