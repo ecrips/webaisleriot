@@ -135,16 +135,17 @@ function destroySlot(theSlot)
 
 function findSlot(x,y)
 {
+	var ret = null;
 	for(var s in slot) {
 		var theSlot = slot[s];
 		var size = theSlot.size;
 
 		if (size[0] <= x && size[1] <= y &&
-		    size[2] >= x && size[3] >=y) {
-			return theSlot;
+		    size[2] >= x && size[3] >= y) {
+			ret = theSlot;
 		}
 	}
-	return null;
+	return ret;
 }
 
 function showHighlight(theSlot)
@@ -328,8 +329,8 @@ function buttonPressed(e, card, slotid, position)
 
 			if (truth(ret)) {
 				scm_apply(mainenv, ["end-move"]);
-				testGameOver();
 				updateSlot(slotid, slot[slotid].scmCards);
+				testGameOver();
 			} else {
 				scm_apply(mainenv, ["discard-move"]);
 				slot[slotid].scmCards = oldCards;
@@ -351,8 +352,13 @@ function makeCard(details, slotid, position)
 		return buttonPressed(ev, e, slotid, position);
 	}
 	e.onclick = function(env) {
+		scm_apply(mainenv, ["record-move",
+				["quote",-1],
+				["quote",[]]]);
 		gameFunctions[funcButtonClicked](mainenv,
 			[["quote", slotid]]);
+		scm_apply(mainenv, ["end-move"]);
+		testGameOver();
 		return false;
 	}
 
