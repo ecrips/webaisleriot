@@ -46,6 +46,12 @@ var highlight;
 
 var startGameLambda;
 
+function setTextContent(element, text) {
+	while (element.firstChild !== null)
+		element.removeChild(element.firstChild);
+	element.appendChild(document.createTextNode(text));
+}
+
 function truth(val)
 {
 	return (val !== false);
@@ -262,6 +268,7 @@ function buttonPressed(e, card, slotid, position)
 
 		container.ontouchmove =
 		container.onmousemove = function(e) {
+			if (!e) e = event;
 			if (e.touches) e=e.targetTouches[0];
 
 			for(var i in cardlist) {
@@ -291,6 +298,7 @@ function buttonPressed(e, card, slotid, position)
 		}
 		container.ontouchend =
 		container.onmouseup = function(e) {
+			if (!e) e = event;
 			if (e.touches) e=e.changedTouches[0];
 
 			container.ontouchmove =
@@ -346,9 +354,11 @@ function makeCard(details, slotid, position)
 	var e = document.createElement("span");
 
 	e.onmousedown = function(ev) {
+		if (!ev) ev = event;
 		return buttonPressed(ev, e, slotid, position);
 	}
 	e.ontouchstart = function(ev) {
+		if (!ev) ev = event;
 		return buttonPressed(ev, e, slotid, position);
 	}
 	e.onclick = function(env) {
@@ -922,7 +932,7 @@ var mainenv = {
 	},
 	"set-statusbar-message": function(env, args) {
 		var text = scm_apply(env, args[0]);
-		document.getElementById("status").textContent = text;
+		setTextContent(document.getElementById("status"), text);
 	},
 	"random": function(env, args) {
 		var range = scm_apply(env, args[0]);
@@ -988,7 +998,7 @@ var mainenv = {
 	"javascript": function(env, args) {
 		var text = scm_apply(env, args[0]);
 		return eval(text);
-	},
+	}
 };
 
 function fetchFile(name)
@@ -1017,7 +1027,7 @@ function parse(text)
 		cursymbol = '';
 	}
 
-	for(var c in text)
+	for(var c=0;c<text.length;c++)
 	{
 		var ch = text.charAt(c);
 
@@ -1143,7 +1153,7 @@ function makeTitle(text)
 	var e;
 	e = document.createElement("div");
 	e.className = "title";
-	e.textContent = text;
+	setTextContent(e, text);
 
 	return e;
 }
@@ -1194,7 +1204,7 @@ function doOptions(env, args)
 		}
 		var d = document.createElement("div");
 		var text = document.createElement("span");
-		text.textContent = op[0];
+		setTextContent(text, op[0]);
 		d.appendChild(text);
 		var value = document.createElement("input");
 		value.type = "checkbox";
@@ -1209,7 +1219,7 @@ function doOptions(env, args)
 	optionDiv.appendChild(document.createElement("p"));
 
 	e = document.createElement("button");
-	e.textContent = "Start";
+	setTextContent(e, "Start");
 	startGameLambda = function() {startGame(options);}
 	e.onclick = startGameLambda;
 	optionDiv.appendChild(e);
@@ -1233,7 +1243,7 @@ function chooseGame()
 		name += ".scm";
 
 		e = document.createElement("button");
-		e.textContent = niceName;
+		setTextContent(e, niceName);
 		e.onclick = function(name,niceName) {return function() {
 			scm_apply(mainenv, ["__game-options",
 				["quote",name],
