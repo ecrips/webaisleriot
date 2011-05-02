@@ -1,5 +1,9 @@
 var debug_text = '';
 
+if (/iPad/.exec(navigator.userAgent)) {
+	document.documentElement.className="big";
+}
+
 function d2(text)
 {
 	text = JSON.stringify(text);

@@ -47,35 +47,37 @@ body {
 	top: 0px;
 	height: 32px;
 }
+.big #toolbar {
+	height: 48px;
+}
+.big .toolbarButton {
+	width: 48px;
+	height: 48px;
+}
+.toolbarButton {
+	width: 32px;
+	height: 32px;
+	background-size: 100%;
+}
 #deal {
 	display: none;
 	background-image: url(deal.png);
-	width: 32px;
-	height: 32px;
 }
 #undo {
 	display: none;
 	background-image: url(undo.png);
-	width: 32px;
-	height: 32px;
 }
 #redo {
 	display: none;
 	background-image: url(redo.png);
-	width: 32px;
-	height: 32px;
 }
 #hint {
 	display: inline-block;
 	background-image: url(info.png);
-	width: 32px;
-	height: 32px;
 }
 #newgame {
 	display: inline-block;
 	background-image: url(new.png);
-	width: 32px;
-	height: 32px;
 }
 #options {
 	text-align: center;
@@ -93,11 +95,11 @@ body {
 <body>
 <div id="debug" style="background-color: white;"></div><!--
 --><div id="toolbar">
-<div id="newgame" onClick="return doNewGame()"></div>
-<div id="deal" onClick="return doDeal()"></div>
-<div id="undo" onClick="return doUndo()"></div>
-<div id="redo" onClick="return doRedo()"></div>
-<div id="hint" onClick="return doHint()"></div>
+<div id="newgame" class="toolbarButton" onClick="return doNewGame()"></div>
+<div id="deal" class="toolbarButton" onClick="return doDeal()"></div>
+<div id="undo" class="toolbarButton" onClick="return doUndo()"></div>
+<div id="redo" class="toolbarButton" onClick="return doRedo()"></div>
+<div id="hint" class="toolbarButton" onClick="return doHint()"></div>
 </div>
 <div id="container">
 <div id="highlight"></div>
