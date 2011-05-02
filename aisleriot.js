@@ -244,6 +244,9 @@ function doDeal()
 
 function buttonPressed(e, card, slotid, position)
 {
+	if (e.touches && e.touches.length > 1)
+		return true;
+
 	var scmCardlist = slot[slotid].scmCards.slice(0,position+1);
 	var cardlist = slot[slotid].cards.slice(0,position+1);
 
@@ -1179,9 +1182,14 @@ function startGame(options)
 	document.getElementById("toolbar").style.display="block";
 
 	optionDiv.style.display = "none";
-	gameFunctions[funcNewGame](mainenv,[]);
+	var ret = gameFunctions[funcNewGame](mainenv,[]);
+	var viewport = document.getElementById("viewport");
+	if (viewport) {
+		viewport.setAttribute("content","width="+(ret[0]*spacingX),
+			false);
+	}
 	scm_apply(mainenv, ["start-game"]);
-	gameFunctions[funcGameOver](mainenv,[]);
+	testGameOver();
 }
 
 function doOptions(env, args)
