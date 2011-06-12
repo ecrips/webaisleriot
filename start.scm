@@ -21,6 +21,13 @@
 		    (or-map pred (cdr list))
 )))
 
+(define (and-map pred list)
+	(if (null? list)
+		#t
+		(and (pred (car list))
+                     (and-map pred (cdr list))
+)))
+
 ; We treat vectors the same as lists
 (define vector list)
 (define (vector->list x) x)
