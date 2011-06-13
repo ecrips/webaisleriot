@@ -77,8 +77,8 @@ var slotLayout =
 		var offX = 0;
 		for(var i = slot.cards.length - 1; i>=0; i--) {
 			var c = slot.cards[i];
-			c.style.left = x;
-			c.style.top = y;
+			c.style.left = x+"px";
+			c.style.top = y+"px";
 			if (offX < 10) {
 				x++;
 				y+=0.5;
@@ -96,8 +96,8 @@ var slotLayout =
 
 		for(var i = slot.cards.length - 1; i>=0; i--) {
 			var c = slot.cards[i];
-			c.style.left = x;
-			c.style.top = y;
+			c.style.left = x+"px";
+			c.style.top = y+"px";
 			y += expand_size;
 		}
 		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
@@ -111,8 +111,8 @@ var slotLayout =
 
 		for(var i = slot.cards.length - 1; i>=0; i--) {
 			var c = slot.cards[i];
-			c.style.left = x;
-			c.style.top = y;
+			c.style.left = x+"px";
+			c.style.top = y+"px";
 			x += expand_size;
 		}
 		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
@@ -131,8 +131,8 @@ function Slot(param,slotid)
 
 	var e = document.createElement("span");
 	e.className = "slot";
-	e.style.left = this.position[0] * spacingX;
-	e.style.top = this.position[1] * spacingY;
+	e.style.left = (this.position[0] * spacingX) + "px";
+	e.style.top = (this.position[1] * spacingY) + "px";
 	this.slotSpan = e;
 	container.appendChild(e);
 }
@@ -168,8 +168,8 @@ function showHighlight(theSlot)
 	}
 	highlight.style.left = obj.style.left;
 	highlight.style.top = obj.style.top;
-	highlight.style.width = cardWidth;
-	highlight.style.height = cardHeight;
+	highlight.style.width = cardWidth+"px";
+	highlight.style.height = cardHeight+"px";
 	highlight.style.display = "block";
 	highlight.style.zIndex = 1000;
 }
@@ -279,10 +279,10 @@ function buttonPressed(e, card, slotid, position)
 			if (e.touches) e=e.targetTouches[0];
 
 			for(var i in cardlist) {
-				cardlist[i].style.left =
-					e.clientX + offsetX + offsets[i][0];
-				cardlist[i].style.top =
-					e.clientY + offsetY + offsets[i][1];
+				cardlist[i].style.left = (e.clientX +
+					offsetX + offsets[i][0])+"px";
+				cardlist[i].style.top = (e.clientY +
+					offsetY + offsets[i][1])+"px";
 			}
 
 			var x = e.clientX - container.offsetLeft;
@@ -317,9 +317,9 @@ function buttonPressed(e, card, slotid, position)
 
 			for(var i in cardlist) {
 				cardlist[i].style.left =
-					startX + offsets[i][0];
+					(startX + offsets[i][0]) + "px";
 				cardlist[i].style.top =
-					startY + offsets[i][1];
+					(startY + offsets[i][1]) + "px";
 				cardlist[i].style.zIndex = oldzIndex[i];
 			}
 
@@ -1274,3 +1274,7 @@ window.onload = function() {
 
 	chooseGame();
 };
+
+window.applicationCache.addEventListener("error", function(e) {
+	setTextContent(document.getElementById("status"), "Failed to update offline cache");
+});

@@ -1,4 +1,6 @@
-FILES=*.js *.scm *.png
+FILES=*.js *.scm *.png *.html
+
+all: cache.manifest apple-touch-icon.png
 
 cache.manifest: ${FILES} Makefile
 	echo CACHE MANIFEST > cache.new
@@ -6,3 +8,5 @@ cache.manifest: ${FILES} Makefile
 	ls ${FILES} >> cache.new
 	mv cache.new cache.manifest
 
+apple-touch-icon.png: icon.svg
+	inkscape -e $@ $<
