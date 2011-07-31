@@ -38,6 +38,7 @@
 
 ; These are just getting stupidly long
 (define (cdaadr x) (cdaar (cdr x)))
+(define (cadadr x) (cadar (cdr x)))
 
 (define __game-list '(ten_across freecell klondike thirteen))
 (set-statusbar-message "Select a game")

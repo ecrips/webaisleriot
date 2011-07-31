@@ -116,6 +116,27 @@ var slotLayout =
 			x += expand_size;
 		}
 		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
+	},
+	"partially-expanded-right":function(slot) {
+		var x = slot.position[0] * spacingX;
+		var y = slot.position[1] * spacingY;
+		slot.size = [x,y];
+		var expand_size = slot.xExpansion*spacingX;
+
+		var start = slot.params[0];
+		if (start > slot.cards.length) {
+			start = slot.cards.length;
+		}
+
+		for(var i = slot.cards.length - 1; i>=0; i--) {
+			var c = slot.cards[i];
+			c.style.left = x+"px";
+			c.style.top = y+"px";
+			if (i < start) {
+				x += expand_size;
+			}
+		}
+		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
 	}
 }
 
@@ -123,6 +144,7 @@ function Slot(param,slotid)
 {
 	this.type = param[0];
 	this.position = param[1];
+	this.params = param.slice(2);
 	this.cards = [];
 	this.scmCards = [];
 	this.yExpansion = 0.2;
@@ -134,6 +156,18 @@ function Slot(param,slotid)
 	e.style.left = (this.position[0] * spacingX) + "px";
 	e.style.top = (this.position[1] * spacingY) + "px";
 	this.slotSpan = e;
+
+	e.onclick = function(env) {
+		scm_apply(mainenv, ["record-move",
+				["quote",-1],
+				["quote",[]]]);
+		gameFunctions[funcButtonClicked](mainenv,
+			[["quote", slotid]]);
+		scm_apply(mainenv, ["end-move"]);
+		testGameOver();
+		return false;
+	}
+
 	container.appendChild(e);
 }
 
@@ -1208,10 +1242,16 @@ function doOptions(env, args)
 
 	optionDiv.appendChild(makeTitle("Options for "+name));
 
+	var radio = false;
+	var radiocount = 0;
 	for(var i in options) {
 		var op = options[i];
-		if (op == "begin-exclusive" || op == "end-exclusive") {
-			/* TODO: exclusive options */
+		if (op == "begin-exclusive") {
+			radio = true;
+			radiocount++;
+			continue;
+		} else if (op == "end-exclusive") {
+			radio = false;
 			continue;
 		}
 		var d = document.createElement("div");
@@ -1219,7 +1259,12 @@ function doOptions(env, args)
 		setTextContent(text, op[0]);
 		d.appendChild(text);
 		var value = document.createElement("input");
-		value.type = "checkbox";
+		if (radio) {
+			value.type = "radio";
+			value.name = "radio"+radiocount;
+		} else {
+			value.type = "checkbox";
+		}
 		value.checked = truth(op[1]);
 		d.appendChild(value);
 
