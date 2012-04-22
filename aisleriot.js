@@ -37,6 +37,8 @@ var gameFunctions;
 var features;
 var gameScore = 0;
 
+var gameState = "stopped";
+
 var slot = [];
 
 var spacingX = 100;
@@ -215,8 +217,12 @@ function hideHighlight()
 
 function testGameOver()
 {
+	if (gameState == "gameover") {
+		return;
+	}
 	var ret = !truth(gameFunctions[funcGameOver](mainenv, []));
 	if (ret) {
+		gameState = "gameover";
 		if (truth(gameFunctions[funcGameWon](mainenv, []))) {
 			alert("You won!");
 		} else {
@@ -228,12 +234,14 @@ function testGameOver()
 function doNewGame()
 {
 	if (confirm("Start new game?")) {
+		gameState = "running";
 		startGameLambda();
 	}
 }
 
 function doUndo()
 {
+	gameState = "running";
 	scm_apply(mainenv, ["undo"]);
 	return false;
 }
