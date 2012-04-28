@@ -1,4 +1,20 @@
-; Library procedures
+; Aisleriot card games in Javascript
+;
+; Copyright (C) 2011-2012  Steven Price
+;
+;  This program is free software; you can redistribute it and/or modify
+;  it under the terms of the GNU General Public License as published by
+;  the Free Software Foundation; either version 2 of the License, or
+;  (at your option) any later version.
+;
+;  This program is distributed in the hope that it will be useful,
+;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;  GNU General Public License for more details.
+;
+;  You should have received a copy of the GNU General Public License
+;  along with this program; if not, write to the Free Software
+
 (define (zero? a) (= a 0))
 
 (define (_ x) x)
@@ -41,7 +57,9 @@
 (define (cadadr x) (cadar (cdr x)))
 
 (define __game-list '(ten_across freecell klondike thirteen))
-(set-statusbar-message "Select a game")
+(set-statusbar-message (string-append "WebAisleriot "
+			(javascript "version")
+			" By Steven Price"))
 
 (define (__game-options name nice-name)
  	(set-statusbar-message "Loading...")

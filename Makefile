@@ -1,6 +1,11 @@
 FILES=*.js *.scm *.png *.html
 
+VERSION=$(shell ./mkversion)
+
 all: cache.manifest apple-touch-icon.png
+	echo $(VERSION)
+
+dist: webaisleriot-$(VERSION).tar.gz
 
 cache.manifest: ${FILES} Makefile
 	echo CACHE MANIFEST > cache.new
@@ -9,3 +14,6 @@ cache.manifest: ${FILES} Makefile
 
 apple-touch-icon.png: icon.svg
 	inkscape -e $@ $<
+
+%.tar.gz: $(FILES) *.svg Makefile
+	tar -czf $@ $+

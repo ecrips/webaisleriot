@@ -1,0 +1,11 @@
+#!/bin/sh
+
+VERSION=`git describe`
+
+tmp=mktemp
+
+sed 's/\(var version = "\).*"/\1'"$VERSION"'"/' < aisleriot.js > $tmp
+cp $tmp aisleriot.js
+rm $tmp
+
+echo $VERSION

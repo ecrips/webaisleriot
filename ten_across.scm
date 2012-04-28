@@ -17,7 +17,6 @@
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (define allow-two-spot-use #t)
-(define all-cards-face-up #f)
 
 ; The set up:
 
@@ -52,13 +51,12 @@
 (define (deal-ten-across-cards)
   (let* ((deal-len (length tableau))
          (direction #t)
-         (deal-cards-int (if all-cards-face-up deal-cards-face-up deal-cards))
          (deal-ten-across-int
           (lambda (num)
             (if direction
                 (begin
                   (deal-cards-face-up stock (list-head tableau num))
-                  (deal-cards-int stock
+                  (deal-cards stock
                               (list-head
                                (list-tail tableau num) (- deal-len num num)))
                   (deal-cards-face-up stock (list-tail tableau (- deal-len num))))
@@ -66,7 +64,7 @@
                   (deal-cards-face-up stock
                                       (reverse (list-tail tableau
                                                           (- deal-len num))))
-                  (deal-cards-int stock
+                  (deal-cards stock
                               (reverse (list-head
                                         (list-tail tableau num)
                                         (- deal-len num num))))
@@ -285,15 +283,10 @@
   (not (game-won)))
 
 (define (get-options)
-  (list (list (_"Allow temporary spots use") allow-two-spot-use)
-        (list (_"All cards face up") all-cards-face-up)
-  )
-)
+  (list (list (_"Allow temporary spots use") allow-two-spot-use)))
 
 (define (apply-options options)
-  (set! allow-two-spot-use (cadar options))
-  (set! all-cards-face-up (cadadr options))
-)
+  (set! allow-two-spot-use (cadar options)))
 
 (define (timeout) #f)
 
