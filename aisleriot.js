@@ -1255,7 +1255,12 @@ function startGame(options)
 	var ret = gameFunctions[funcNewGame](mainenv,[]);
 	var viewport = document.getElementById("viewport");
 	if (viewport) {
-		viewport.setAttribute("content","width="+(ret[0]*spacingX),
+		var width = ret[0]*spacingX;
+		var aspect = screen.width/screen.height;
+		if (ret[1]*spacingY*aspect > width) {
+			width = ret[1]*spacingY*aspect;
+		}
+		viewport.setAttribute("content","width="+width,
 			false);
 	}
 	scm_apply(mainenv, ["start-game"]);
