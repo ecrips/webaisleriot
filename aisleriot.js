@@ -347,8 +347,12 @@ function buttonPressed(e, card, slotid, position)
 					offsetY + offsets[i][1])+"px";
 			}
 
-			var x = e.clientX - container.offsetLeft;
-			var y = e.clientY - container.offsetTop;
+			var x = e.pageX - container.offsetLeft;
+			var y = e.pageY - container.offsetTop;
+			if (!e.pageX) {
+				x = e.clientX - container.offsetLeft;
+				y = e.clientY - container.offsetLeft;
+			}
 
 			var theSlot = findSlot(x, y);
 			if (!theSlot) {
@@ -385,8 +389,12 @@ function buttonPressed(e, card, slotid, position)
 				cardlist[i].style.zIndex = oldzIndex[i];
 			}
 
-			var x = e.clientX - container.offsetLeft;
-			var y = e.clientY - container.offsetTop;
+			var x = e.pageX - container.offsetLeft;
+			var y = e.pageY - container.offsetTop;
+			if (!e.pageX) {
+				x = e.clientX - container.offsetLeft;
+				y = e.clientY - container.offsetLeft;
+			}
 
 			var theSlot = findSlot(x, y);
 			if (!theSlot) return;
