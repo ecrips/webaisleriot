@@ -3,7 +3,7 @@ FILES=*.js *.scm *.png *.html
 VERSION=$(shell ./mkversion)
 
 all: cache.manifest apple-touch-icon.png
-	echo $(VERSION)
+	@echo $(VERSION)
 
 dist: webaisleriot-$(VERSION).tar.gz
 

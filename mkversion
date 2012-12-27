@@ -1,6 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 
-VERSION=`git describe`
+if [[ "a$1" != "a" ]]; then
+	VERSION=$1
+else
+	VERSION=`git describe --dirty`
+fi
+
+CURVER=`grep "var version = " aisleriot.js | sed "s/.*\"\(.*\)\".*/\\1/"`
+if [[ "$CURVER" == "$VERSION" ]]; then
+	echo $VERSION
+	exit
+fi
 
 tmp=mktemp
 

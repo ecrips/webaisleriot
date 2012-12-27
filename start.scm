@@ -24,7 +24,8 @@
 (define (version) 0.1)
 (define (use-modules x) #t)
 (define (ice-9 x) #f)
-(define format #f)
+
+(define (load x) (load-file x))
 
 (define (boolean? x) (or (eq? x #t) (eq? x #f)))
 
@@ -56,7 +57,7 @@
 (define (cdaadr x) (cdaar (cdr x)))
 (define (cadadr x) (cadar (cdr x)))
 
-(define __game-list '(ten_across freecell klondike thirteen))
+(define __game-list '(ten_across freecell klondike thirteen spider spiderette spider_three_decks))
 (set-statusbar-message (string-append "WebAisleriot "
 			(javascript "version")
 			" By Steven Price"))
@@ -68,4 +69,3 @@
  	(set-statusbar-message "Choose options")
 	((javascript "doOptions") nice-name)
 )
-

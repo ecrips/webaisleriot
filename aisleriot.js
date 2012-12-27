@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-var version = "v0.2";
+var version = "v0.3";
 
 var debug_text = '';
 
@@ -519,14 +519,20 @@ var mainenv = {
 			var stmts = args.slice(1);
 			var fname = args[0][0];
 			var params = args[0].slice(1);
-			env[fname] = function(argsenv, args) {
-				args = scm_eval(argsenv, args);
+			env[fname] = function(argsenv, inargs) {
+				args = scm_eval(argsenv, inargs);
 				var newenv = {__parent: env};
 				for(var i=0; i<params.length; i++) {
 					if (params[i] == ".") {
 						newenv[params[i+1]] =
 							args.slice(i);
 						break;
+					}
+					if (args[i] == null) {
+						d("Argument to "+fname+" is null");
+						d([inargs,args]);
+						d(params.length);
+						d(inargs.length);
 					}
 					newenv[params[i]] = args[i];
 				}
@@ -678,6 +684,13 @@ var mainenv = {
 	},
 	"eq?": function(env, args) {
 		args = scm_eval(env, args);
+		if (typeof(args[0]) == "object" &&
+			typeof(args[1]) == "object" &&
+			args[0].length == 0 &&
+			args[1].length == 0) {
+			// An empty list is equal to all other empty lists
+			return true;
+		}
 		var ret = (args[0] === args[1]);
 		return ret;
 	},
@@ -831,6 +844,11 @@ var mainenv = {
 	},
 	"car": function(env, args) {
 		var list = scm_apply(env, args[0]);
+		if (list.length == 0) {
+			d("Attempt to 'car' an empty list");
+			d(args);
+			die();
+		}
 		return list[0];
 	},
 	"cdr": function(env, args) {
@@ -990,6 +1008,25 @@ var mainenv = {
 			return less(env, [["quote",a],["quote",b]]);
 		});
 		return items;
+	},
+	"format": function(env, args) {
+		var format_string = scm_apply(env, args[0]);
+		var options = scm_eval(env, args.slice(1));
+		var fstring = /~./;
+		var t;
+		var text = "";
+		while (t = fstring.exec(format_string)) {
+			text += format_string.substr(0, t.index);
+			if (t[0] == "~a") {
+				text += options[0];
+			} else {
+				text += "<unknown "+t[0]+">";
+			}
+			options = options.slice(1);
+			format_string = format_string.substr(t.index+t[0].length);
+		}
+		text += format_string;
+		return text;
 	},
 
 	"set-lambda": function(env, args) {
@@ -1335,7 +1372,7 @@ function chooseGame()
 		var name = games[i];
 		var niceName = name.replace(/^(.)/, function(a)
 			{return a.toUpperCase();});
-		niceName = niceName.replace(/_(.)/, function(a)
+		niceName = niceName.replace(/_(.)/g, function(a)
 			{return " "+a[1].toUpperCase();});
 
 		name += ".scm";
