@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-var version = "v0.3";
+var version = "v0.4";
 
 var debug_text = '';
 
@@ -71,6 +71,8 @@ var container;
 var highlight;
 
 var startGameLambda;
+
+var undo_enabled = false;
 
 function setTextContent(element, text) {
 	while (element.firstChild !== null)
@@ -1090,6 +1092,10 @@ var mainenv = {
 	"undo-set-sensitive": function(env, args) {
 		var undo = document.getElementById("undo");
 		var state = scm_apply(env, args[0]);
+		undo_enabled = state;
+		if (undo_enabled) {
+			location.hash = "ingame";
+		}
 		undo.style.display = state?"inline-block":"none";
 	},
 	"redo-set-sensitive": function(env, args) {
@@ -1401,3 +1407,13 @@ window.onload = function() {
 window.applicationCache.addEventListener("error", function(e) {
 	setTextContent(document.getElementById("status"), "Failed to update offline cache");
 });
+
+window.onhashchange = function() {
+	console.log("onhashchange",location.hash);
+	if (location.hash != "#ingame") {
+		doUndo();
+		if (undo_enabled) {
+			location.hash = "ingame";
+		}
+	}
+};
