@@ -9,7 +9,7 @@ dist: webaisleriot-$(VERSION).tar.gz
 
 cache.manifest: ${FILES} Makefile
 	echo CACHE MANIFEST > cache.new
-	md5sum ${FILES} | sed "s/\(.*\) \(.*\)/\2 # \1/" >> cache.new
+	md5sum ${FILES} | sed "s/\(.*\) \(.*\)/\2\n# \1/" >> cache.new
 	mv cache.new cache.manifest
 
 apple-touch-icon.png: icon.svg
