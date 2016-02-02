@@ -1,6 +1,6 @@
 // Aisleriot card games in Javascript
 //
-// Copyright (C) 2011-2012  Steven Price
+// Copyright (C) 2011-2016  Steven Price
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+(function(){
 
 var version = "v0.4";
 
@@ -246,19 +248,22 @@ function testGameOver()
 	if (ret) {
 		gameState = "gameover";
 		if (truth(gameFunctions[funcGameWon](mainenv, []))) {
-			alert("You won!");
+			dialog("You won!");
 		} else {
-			alert("You lost!");
+			dialog("You lost!");
 		}
 	}
 }
 
 function doNewGame()
 {
-	if (confirm("Start new game?")) {
-		gameState = "running";
-		startGameLambda();
-	}
+	dialog("Start new game?", ["Yes", "No"],
+		function(result) {
+			if (result == "Yes") {
+				gameState = "running";
+				startGameLambda();
+			}
+		});
 }
 
 function doUndo()
@@ -279,11 +284,11 @@ function doHint()
 	var hint = gameFunctions[funcGetHint](mainenv, []);
 
 	if (!truth(hint[0])) {
-		alert("This game does not have hint support");
+		dialog("This game does not have hint support");
 	} else if (hint[0] == 0) {
-		alert(hint[1]);
+		dialog(hint[1]);
 	} else if (hint[0] == 1 || hint[0] == 2) {
-		alert("Move "+hint[1]+" onto "+hint[2]);
+		dialog("Move "+hint[1]+" onto "+hint[2]);
 	} else {
 		d(hint);
 	}
@@ -294,7 +299,7 @@ function doHint()
 function doDeal()
 {
 	if (!truth(gameFunctions[funcDealable])) {
-		alert("Deal is not available at this time");
+		dialog("Deal is not available at this time");
 		return;
 	}
 	scm_apply(mainenv, ["record-move",
@@ -1395,7 +1400,48 @@ function chooseGame()
 	}
 }
 
+function dialog(msg, buttons, callback) {
+	var dialog_overlay = document.getElementById("dialog-overlay");
+	var dialog_msg = document.getElementById("dialog-msg");
+	dialog_msg.innerHTML = msg;
+
+	var dialog_buttons = document.getElementById("dialog-buttons");
+	while (dialog_buttons.firstChild !== null)
+		dialog_buttons.removeChild(dialog_buttons.firstChild);
+
+	if (!callback) {
+		callback = function() {};
+	}
+	if (!buttons) {
+		buttons = ["Ok"];
+	}
+
+	function makeButton(b) {
+		var button = document.createElement("button");
+		button.appendChild(document.createTextNode(b));
+		button.onclick = function() {
+			dialog_overlay.style.visibility = "hidden";
+			callback(b);
+		};
+		dialog_buttons.appendChild(button);
+	}
+
+	buttons.forEach(function(e,i) {
+		makeButton(e);
+	});
+
+	console.log(dialog_overlay.style.visibility);
+	dialog_overlay.style.visibility = "visible";
+	console.log(dialog_overlay.style.visibility);
+}
+
 window.onload = function() {
+	document.getElementById("newgame").onclick = doNewGame;
+	document.getElementById("deal").onclick = doDeal;
+	document.getElementById("undo").onclick = doUndo;
+	document.getElementById("redo").onclick = doRedo;
+	document.getElementById("hint").onclick = doHint;
+
 	container = document.getElementById("container");
 	highlight = document.getElementById("highlight");
 
@@ -1417,3 +1463,5 @@ window.onhashchange = function() {
 		}
 	}
 };
+
+})();
