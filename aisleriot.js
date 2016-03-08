@@ -242,6 +242,12 @@ function hideHighlight()
 
 function testGameOver()
 {
+	function game_over_handler(result) {
+		if (result == "New Game") {
+			gameState = "running";
+			startGameLambda();
+		}
+	}
 	if (gameState == "gameover") {
 		return;
 	}
@@ -249,9 +255,11 @@ function testGameOver()
 	if (ret) {
 		gameState = "gameover";
 		if (truth(gameFunctions[funcGameWon](mainenv, []))) {
-			dialog("You won!");
+			dialog("You won!", ["Ok", "New Game"],
+				game_over_handler);
 		} else {
-			dialog("You lost!");
+			dialog("You lost!", ["Ok", "New Game"],
+				game_over_handler);
 		}
 	}
 }
