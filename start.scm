@@ -59,7 +59,7 @@
 
 (define __game-list '(ten_across freecell klondike thirteen spider spiderette spider_three_decks))
 (set-statusbar-message (string-append "WebAisleriot "
-			(javascript "version")
+			(__get-version)
 			" By Steven Price"))
 
 (define (__game-options name nice-name)
@@ -67,5 +67,5 @@
 	(load-file "sol.scm")
 	(load-file name)
  	(set-statusbar-message "Choose options")
-	((javascript "doOptions") nice-name)
+	(__do-options nice-name)
 )

@@ -1123,10 +1123,10 @@ var mainenv = {
 		var fname = scm_apply(env, args[0]);
 		compile(fetchFile(fname));
 	},
-	"javascript": function(env, args) {
-		var text = scm_apply(env, args[0]);
-		return eval(text);
-	}
+	"__get-version": function(env, args) {
+		return version;
+	},
+	"__do-options": doOptions
 };
 
 function fetchFile(name)
@@ -1216,6 +1216,8 @@ function parse(text)
 	return curlist;
 }
 
+var number_regexp = /^-?[0-9]+(?:\.[0-9]+)?$/;
+
 function scm_apply(env, statement)
 {
 	var theenv = env;
@@ -1225,9 +1227,7 @@ function scm_apply(env, statement)
 		return statement;
 	}
 	if (typeof statement == "string") {
-		if (statement.match("^-?[0-9]+$")) {
-			return parseInt(statement);
-		} else if (statement.match("^-?[0-9]+\.[0-9]+$")) {
+		if (number_regexp.exec(statement)) {
 			return parseFloat(statement);
 		}
 		while (theenv[statement] == null && theenv.__parent) {
@@ -1433,9 +1433,7 @@ function dialog(msg, buttons, callback) {
 		makeButton(e);
 	});
 
-	console.log(dialog_overlay.style.visibility);
 	dialog_overlay.style.visibility = "visible";
-	console.log(dialog_overlay.style.visibility);
 }
 
 function die(msg) {
