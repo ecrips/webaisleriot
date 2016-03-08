@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 (function(){
+"use strict";
 
 var version = "v0.4";
 
@@ -164,7 +165,7 @@ var slotLayout =
 		}
 		slot.size = slot.size.concat(x+cardWidth, y+cardHeight);
 	}
-}
+};
 
 function Slot(param,slotid)
 {
@@ -192,7 +193,7 @@ function Slot(param,slotid)
 		scm_apply(mainenv, ["end-move"]);
 		testGameOver();
 		return false;
-	}
+	};
 
 	container.appendChild(e);
 }
@@ -206,7 +207,7 @@ function destroySlot(theSlot)
 function findSlot(x,y)
 {
 	var ret = null;
-	for(var s in slot) {
+	for(var s=0;s<slot.length;s++) {
 		var theSlot = slot[s];
 		var size = theSlot.size;
 
@@ -333,7 +334,7 @@ function buttonPressed(e, card, slotid, position)
 
 		var offsets = [];
 		var oldzIndex = [];
-		for(var i in cardlist) {
+		for(var i=0; i<cardlist.length; i++) {
 			offsets[i] = [
 				parseInt(cardlist[i].style.left) - startX,
 				parseInt(cardlist[i].style.top) - startY
@@ -347,7 +348,7 @@ function buttonPressed(e, card, slotid, position)
 			if (!e) e = event;
 			if (e.touches) e=e.targetTouches[0];
 
-			for(var i in cardlist) {
+			for(var i=0; i<cardlist.length; i++) {
 				cardlist[i].style.left = (e.clientX +
 					offsetX + offsets[i][0])+"px";
 				cardlist[i].style.top = (e.clientY +
@@ -375,7 +376,7 @@ function buttonPressed(e, card, slotid, position)
 			} else {
 				hideHighlight();
 			}
-		}
+		};
 		container.ontouchend =
 		container.onmouseup = function(e) {
 			if (!e) e = event;
@@ -388,7 +389,7 @@ function buttonPressed(e, card, slotid, position)
 
 			hideHighlight();
 
-			for(var i in cardlist) {
+			for(var i=0; i<cardlist.length; i++) {
 				cardlist[i].style.left =
 					(startX + offsets[i][0]) + "px";
 				cardlist[i].style.top =
@@ -427,7 +428,7 @@ function buttonPressed(e, card, slotid, position)
 				scm_apply(mainenv, ["discard-move"]);
 				slot[slotid].scmCards = oldCards;
 			}
-		}
+		};
 		return false;
 	}
 	return true;
@@ -436,15 +437,16 @@ function buttonPressed(e, card, slotid, position)
 function makeCard(details, slotid, position)
 {
 	var e = document.createElement("span");
+	var offx, offy;
 
 	e.onmousedown = function(ev) {
 		if (!ev) ev = event;
 		return buttonPressed(ev, e, slotid, position);
-	}
+	};
 	e.ontouchstart = function(ev) {
 		if (!ev) ev = event;
 		return buttonPressed(ev, e, slotid, position);
-	}
+	};
 	e.onclick = function(env) {
 		scm_apply(mainenv, ["record-move",
 				["quote",-1],
@@ -454,7 +456,7 @@ function makeCard(details, slotid, position)
 		scm_apply(mainenv, ["end-move"]);
 		testGameOver();
 		return false;
-	}
+	};
 
 	e.className = "card";
 	if (!details[2]) {
@@ -486,7 +488,7 @@ function layoutSlot(slotid)
 
 function removeCards(theSlot)
 {
-	for(var i in theSlot.cards) {
+	for(var i=0;i<theSlot.cards.length;i++) {
 		container.removeChild(theSlot.cards[i]);
 	}
 	theSlot.cards = [];
@@ -507,7 +509,7 @@ function updateSlot(slotid, cards)
 function listReplace(inlist, item, replaceWith)
 {
 	var list = inlist.slice(0);
-	for(var i in list) {
+	for(var i=0;i<list.length;i++) {
 		var e = list[i];
 		if (typeof(e) == "object") {
 			list[i] = listReplace(list[i], item, replaceWith);
@@ -544,7 +546,7 @@ var mainenv = {
 					newenv[params[i]] = args[i];
 				}
 				return scm_eval(newenv, stmts).pop();
-			}
+			};
 		}
 	},
 	"lambda": function(env, args) {
@@ -556,7 +558,7 @@ var mainenv = {
 				var newenv = {__parent: env};
 				newenv[param_name] = args;
 				return scm_eval(newenv, stmts).pop();
-			}
+			};
 		}
 
 		var params = args[0];
@@ -572,12 +574,12 @@ var mainenv = {
 				newenv[params[i]] = args[i];
 			}
 			return scm_eval(newenv, stmts).pop();
-		}
+		};
 	},
 	"+": function(env, args) {
 		args = scm_eval(env, args);
 		var out = 0;
-		for(var i in args) {
+		for(var i=0;i<args.length;i++) {
 			out += args[i];
 		}
 		return out;
@@ -593,7 +595,7 @@ var mainenv = {
 	"*": function(env, args) {
 		args = scm_eval(env, args);
 		var out = 1;
-		for(var i in args) {
+		for(var i = 0; i < args.length; i++) {
 			out *= args[i];
 		}
 		return out;
@@ -618,7 +620,7 @@ var mainenv = {
 		args = scm_eval(env, args);
 		var out = parseInt(args[0]);
 		for(var i = 1; i < args.length; i++) {
-			var num = parseInt(args[i])
+			var num = parseInt(args[i]);
 			if (num > out) out = num;
 		}
 		return out;
@@ -627,7 +629,7 @@ var mainenv = {
 		args = scm_eval(env, args);
 		var out = parseInt(args[0]);
 		for(var i = 1; i < args.length; i++) {
-			var num = parseInt(args[i])
+			var num = parseInt(args[i]);
 			if (num < out) out = num;
 		}
 		return out;
@@ -672,7 +674,7 @@ var mainenv = {
 	},
 	"and": function(env, args) {
 		var val;
-		for(var i in args) {
+		for(var i = 0; i < args.length; i++) {
 			val = scm_apply(env, args[i]);
 			if (!truth(val)) {
 				return false;
@@ -681,7 +683,7 @@ var mainenv = {
 		return val;
 	},
 	"or": function(env, args) {
-		for(var i in args) {
+		for(var i = 0; i < args.length; i++) {
 			var val = scm_apply(env, args[i]);
 			if (truth(val)) {
 				return val;
@@ -737,7 +739,7 @@ var mainenv = {
 		}
 	},
 	"cond": function(env, args) {
-		for(var i in args) {
+		for(var i = 0; i < args.length; i++) {
 			var cond = scm_apply(env, args[i][0]);
 			if (truth(cond)) {
 				return scm_eval(env, args[i].slice(1)).pop();
@@ -750,10 +752,11 @@ var mainenv = {
 		var variables = args[0];
 		var test = args[1];
 		var stmts = args.slice(2);
+		var v;
 
 		// Init phase
-		for(var i in variables) {
-			var v = variables[i];
+		for(var i = 0; i < variables.length; i++) {
+			v = variables[i];
 			newenv[v[0]] = scm_apply(env, v[1]);
 		}
 		var testval = scm_apply(newenv, test[0]);
@@ -764,8 +767,8 @@ var mainenv = {
 			newenv = {__parent: env};
 
 			// Step variables
-			for(var i in variables) {
-				var v = variables[i];
+			for(var i2 = 0; i2 < variables.length; i2++) {
+				v = variables[i2];
 				if (v[2])
 					newenv[v[0]] = scm_apply(oldenv, v[2]);
 			}
@@ -807,7 +810,7 @@ var mainenv = {
 				}
 				
 				return scm_eval(newenv, stmts).pop();
-			}
+			};
 		}
 
 		for(var i=0; i<assignments.length; i++) {
@@ -902,7 +905,7 @@ var mainenv = {
 		var func = scm_apply(env, args[0]);
 		var list = scm_apply(env, args[1]);
 		var output = [];
-		for(var i in list) {
+		for(var i = 0; i < list.length; i++) {
 			output.push(func(env, [list[i]]));
 		}
 		return output;
@@ -942,7 +945,7 @@ var mainenv = {
 	"append": function(env, args) {
 		var lists = scm_eval(env, args);
 		var output = [];
-		for(var i in lists) {
+		for(var i = 0; i< lists.length; i++) {
 			output = output.concat(lists[i]);
 		}
 		return output;
@@ -950,7 +953,7 @@ var mainenv = {
 	"string-append": function(env, args) {
 		var strs = scm_eval(env, args);
 		var output = "";
-		for(var i in strs) {
+		for(var i = 0; i < strs.length; i++) {
 			output += strs[i];
 		}
 		return output;
@@ -974,7 +977,7 @@ var mainenv = {
 
 		env[name] = function(argsenv, args) {
 			var realBody = body;
-			for(var i in params) {
+			for(var i = 0; i < params.length; i++) {
 				realBody = listReplace(realBody,
 					","+params[i], args[i]);
 			}
@@ -1010,7 +1013,7 @@ var mainenv = {
 		var items = scm_apply(env, args[0]);
 		var less = scm_apply(env, args[1]);
 
-		var items = items.slice(0);
+		items = items.slice(0);
 		items.sort(function(b,a) {
 			return less(env, [["quote",a],["quote",b]]);
 		});
@@ -1046,7 +1049,7 @@ var mainenv = {
 		return features;
 	},
 	"reset-surface": function(env, args) {
-		for(var i in slot) {
+		for(var i = 0; i < slot.length; i++) {
 			destroySlot(slot[i]);
 		}
 		slot = [];
@@ -1080,7 +1083,7 @@ var mainenv = {
 	},
 	"get-slot": function(env, args) {
 		var slotid = scm_apply(env, args[0]);
-		ret = [slotid, slot[slotid].scmCards];
+		var ret = [slotid, slot[slotid].scmCards];
 		return ret;
 	},
 	"set-cards-c!": function(env, args) {
@@ -1118,7 +1121,7 @@ var mainenv = {
 
 	"load-file": function(env, args) {
 		var fname = scm_apply(env, args[0]);
-		compile(fetchFile(fname))
+		compile(fetchFile(fname));
 	},
 	"javascript": function(env, args) {
 		var text = scm_apply(env, args[0]);
@@ -1138,7 +1141,6 @@ function parse(text)
 {
 	var inComment = false;
 	var inString = false;
-	var output = '';
 
 	var globallist = [];
 	var curlist = globallist;
@@ -1155,11 +1157,12 @@ function parse(text)
 	for(var c=0;c<text.length;c++)
 	{
 		var ch = text.charAt(c);
+		var newList;
 
 		if (inString) {
 			if (ch == '"') {
-				cursymbol = ["quote",cursymbol]
-				push_symbol()
+				cursymbol = ["quote",cursymbol];
+				push_symbol();
 				inString = false;
 			} else {
 				cursymbol += ch;
@@ -1180,7 +1183,7 @@ function parse(text)
 			push_symbol();
 			curlist = stack[stack.length-1];
 		} else if (ch == '\'') {
-			var newList = ["quote"];
+			newList = ["quote"];
 			curlist.push(newList);
 			curlist = newList;
 		} else if (ch == '(') {
@@ -1194,14 +1197,14 @@ function parse(text)
 			} else if (cursymbol != "") {
 				push_symbol();
 			}
-			var newList = [];
+			newList = [];
 			curlist.push(newList);
 			stack.push(newList);
 			cursymbol = '';
 			curlist = newList;
 		} else if (ch == ')') {
 			push_symbol();
-			stack.pop()
+			stack.pop();
 			curlist = stack[stack.length-1];
 		} else if (ch == '"') {
 			push_symbol();
@@ -1239,7 +1242,7 @@ function scm_apply(env, statement)
 				args = scm_eval(env, args);
 				d({eval_args:args});
 				die();
-			}
+			};
 		}
 		return theenv[statement];
 	}
@@ -1251,14 +1254,14 @@ function scm_apply(env, statement)
 		return func(env, statement.slice(1));
 	} else {
 		d(["Attempted to apply",func]);
-		bla();
+		die(func+" not defined");
 	}
 }
 
 function scm_eval(env, stmts)
 {
-	var output = []
-	for(var line in stmts) {
+	var output = [];
+	for(var line = 0; line < stmts.length; line++) {
 		var statement = stmts[line];
 
 		output.push(scm_apply(env, statement));
@@ -1288,7 +1291,7 @@ function startGame(options)
 	var optionDiv = document.getElementById("options");
 
 	if (options) {
-		for(var i in options) {
+		for(var i = 0; i < options.length; i++) {
 			var op = options[i];
 			if (op.length == 2) {
 				op[1] = op.check.checked;
@@ -1333,7 +1336,7 @@ function doOptions(env, args)
 
 	var radio = false;
 	var radiocount = 0;
-	for(var i in options) {
+	for(var i = 0; i < options.length; i++) {
 		var op = options[i];
 		if (op == "begin-exclusive") {
 			radio = true;
@@ -1364,9 +1367,9 @@ function doOptions(env, args)
 
 	optionDiv.appendChild(document.createElement("p"));
 
-	e = document.createElement("button");
+	var e = document.createElement("button");
 	setTextContent(e, "Start");
-	startGameLambda = function() {startGame(options);}
+	startGameLambda = function() {startGame(options);};
 	e.onclick = startGameLambda;
 	optionDiv.appendChild(e);
 }
@@ -1379,7 +1382,7 @@ function chooseGame()
 
 	optionDiv.appendChild(makeTitle("Choose a game:"));
 
-	for(var i in games) {
+	for(var i = 0; i < games.length; i++) {
 		var name = games[i];
 		var niceName = name.replace(/^(.)/, function(a)
 			{return a.toUpperCase();});
@@ -1388,13 +1391,13 @@ function chooseGame()
 
 		name += ".scm";
 
-		e = document.createElement("button");
+		var e = document.createElement("button");
 		setTextContent(e, niceName);
 		e.onclick = function(name,niceName) {return function() {
 			scm_apply(mainenv, ["__game-options",
 				["quote",name],
 				["quote",niceName]]);
-		}}(name,niceName);
+		};}(name,niceName);
 
 		optionDiv.appendChild(e);
 	}
@@ -1433,6 +1436,11 @@ function dialog(msg, buttons, callback) {
 	console.log(dialog_overlay.style.visibility);
 	dialog_overlay.style.visibility = "visible";
 	console.log(dialog_overlay.style.visibility);
+}
+
+function die(msg) {
+	dialog("Fatal error: "+msg);
+	throw 0;
 }
 
 window.onload = function() {
