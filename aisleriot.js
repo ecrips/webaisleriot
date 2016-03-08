@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.4";
+var version = "v0.5";
 
 var debug_text = '';
 
