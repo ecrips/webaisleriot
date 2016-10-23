@@ -1,6 +1,6 @@
 ; Aisleriot card games in Javascript
 ;
-; Copyright (C) 2011-2012  Steven Price
+; Copyright (C) 2011-2016  Steven Price
 ;
 ;  This program is free software; you can redistribute it and/or modify
 ;  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@
 (define (cdaadr x) (cdaar (cdr x)))
 (define (cadadr x) (cadar (cdr x)))
 
-(define __game-list '(ten_across freecell klondike thirteen spider spiderette spider_three_decks))
+(define __game-list '(ten_across freecell klondike thirteen triple-peaks spider spiderette spider_three_decks))
 (set-statusbar-message (string-append "WebAisleriot "
 			(__get-version)
 			" By Steven Price"))

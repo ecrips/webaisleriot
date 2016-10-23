@@ -624,6 +624,12 @@ var mainenv = {
 		}
 		return out;
 	},
+	"modulo": function(env, args) {
+		args = scm_eval(env, args);
+		var arg1 = parseInt(args[0]);
+		var arg2 = parseInt(args[1]);
+		return arg1 % arg2;
+	},
 	"max": function(env, args) {
 		args = scm_eval(env, args);
 		var out = parseInt(args[0]);
