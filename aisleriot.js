@@ -1433,14 +1433,22 @@ function dialog(msg, buttons, callback) {
 		buttons = ["Ok"];
 	}
 
+	var firstButton = null;
+
 	function makeButton(b) {
 		var button = document.createElement("button");
 		button.appendChild(document.createTextNode(b));
 		button.onclick = function() {
 			dialog_overlay.style.visibility = "hidden";
+			while (dialog_buttons.firstChild !== null)
+				dialog_buttons.removeChild(
+					dialog_buttons.firstChild);
 			callback(b);
 		};
 		dialog_buttons.appendChild(button);
+		if (firstButton === null) {
+			firstButton = button;
+		}
 	}
 
 	buttons.forEach(function(e,i) {
@@ -1448,6 +1456,10 @@ function dialog(msg, buttons, callback) {
 	});
 
 	dialog_overlay.style.visibility = "visible";
+
+	if (firstButton) {
+		firstButton.focus();
+	}
 }
 
 function die(msg) {
