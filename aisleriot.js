@@ -57,7 +57,7 @@ var funcDealable = 12;
 
 var gameFunctions;
 
-var features;
+var features = 2; // Score disabled
 var gameScore = 0;
 
 var gameState = "stopped";
@@ -93,6 +93,23 @@ function updateFeatures(newFeatures)
 	features = newFeatures;
 	document.getElementById("deal").style.display =
 		(features & 4)?"inline-block":"none";
+}
+
+var statusbar_text;
+
+function updateStatusBar(new_text)
+{
+	if (new_text) {
+		statusbar_text = new_text;
+	}
+	var s = document.getElementById("status")
+	setTextContent(s, statusbar_text);
+	if ((features & 2) == 0) {
+		var score = document.createElement("div");
+		score.className = "score";
+		setTextContent(score, "Score: "+gameScore);
+		s.appendChild(score);
+	}
 }
 
 var slotLayout =
@@ -1052,6 +1069,10 @@ var mainenv = {
 		text += format_string;
 		return text;
 	},
+	"integer-expt": function(env, args) {
+		args = scm_eval(env, args);
+		return args[0] ** args[1];
+	},
 
 	"set-lambda": function(env, args) {
 		gameFunctions = scm_eval(env, args);
@@ -1070,7 +1091,7 @@ var mainenv = {
 	},
 	"set-statusbar-message": function(env, args) {
 		var text = scm_apply(env, args[0]);
-		setTextContent(document.getElementById("status"), text);
+		updateStatusBar(text);
 	},
 	"random": function(env, args) {
 		var range = scm_apply(env, args[0]);
@@ -1110,6 +1131,7 @@ var mainenv = {
 	},
 	"set-score!": function(env, args) {
 		gameScore = scm_apply(env, args[0]);
+		updateStatusBar();
 	},
 	"undo-set-sensitive": function(env, args) {
 		var undo = document.getElementById("undo");
@@ -1147,6 +1169,7 @@ function fetchFile(name)
 {
 	var request = new XMLHttpRequest();
 	request.open("GET", name, false);
+	request.overrideMimeType("text/plain");
 	request.send(null);
 	return request.responseText;
 }
