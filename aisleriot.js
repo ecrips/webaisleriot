@@ -1327,6 +1327,8 @@ function startGame(options)
 {
 	var optionDiv = document.getElementById("options");
 
+	gameScore = 0;
+
 	if (options) {
 		for(var i = 0; i < options.length; i++) {
 			var op = options[i];
