@@ -1,6 +1,6 @@
 // Aisleriot card games in Javascript
 //
-// Copyright (C) 2011-2017  Steven Price
+// Copyright (C) 2011-2018  Steven Price
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,9 +19,31 @@
 (function(){
 "use strict";
 
-var version = "v0.8";
+var version = "v0.9";
 
 var debug_text = '';
+
+var randomSequence = [];
+
+var seed;
+
+function myrand()
+{
+	if (seed === null) {
+		seed = randomSequence[1];
+	}
+	seed = (Math.imul(seed, 1103515245) + 12345) >>> 0;
+	return (seed >>> 16);
+}
+
+function getrand(max)
+{
+	var val = max;
+	while (val >= max) {
+		val = myrand() % 64;
+	}
+	return val;
+}
 
 if (/Mobile/.exec(navigator.userAgent)) {
 	document.documentElement.className="big";
@@ -263,6 +285,11 @@ function testGameOver()
 		if (result == "New Game") {
 			gameState = "running";
 			startGameLambda();
+		} else if (result == "Record win") {
+			location.href = randomSequence[2];
+		} else if (result == "Restart") {
+			gameState = "running";
+			startGameLambda();
 		}
 	}
 	if (gameState == "gameover") {
@@ -270,12 +297,21 @@ function testGameOver()
 	}
 	var ret = !truth(gameFunctions[funcGameOver](mainenv, []));
 	if (ret) {
+		var options = ["Ok", "New Game"];
+		var won = truth(gameFunctions[funcGameWon](mainenv, []));
+		if (randomSequence[0] == "seed") {
+			if (randomSequence.length > 2 && won) {
+				options = ["Record win"];
+			} else if (!won) {
+				options = ["Restart"];
+			}
+		}
 		gameState = "gameover";
-		if (truth(gameFunctions[funcGameWon](mainenv, []))) {
-			dialog("You won!", ["Ok", "New Game"],
+		if (won) {
+			dialog("You won!", options,
 				game_over_handler);
 		} else {
-			dialog("You lost!", ["Ok", "New Game"],
+			dialog("You lost!", options,
 				game_over_handler);
 		}
 	}
@@ -283,7 +319,11 @@ function testGameOver()
 
 function doNewGame()
 {
-	dialog("Start new game?", ["Yes", "No"],
+	var text = "Start new game?";
+	if (randomSequence[0] == "seed") {
+		text = "Restart game?";
+	}
+	dialog(text, ["Yes", "No"],
 		function(result) {
 			if (result == "Yes") {
 				gameState = "running";
@@ -1095,7 +1135,17 @@ var mainenv = {
 	},
 	"random": function(env, args) {
 		var range = scm_apply(env, args[0]);
-		var out = Math.floor(Math.random()*range);
+		var out;
+		if (randomSequence.length == 0) {
+			out = Math.floor(Math.random()*range);
+		} else if (randomSequence[0] == "seed") {
+			out = getrand(range);
+		} else {
+			out = parseInt(randomSequence.shift());
+			if (out >= range) {
+				d("Random sequence invalid!");
+			}
+		}
 		return out;
 	},
 	"add-slot": function(env, args) {
@@ -1327,6 +1377,7 @@ function startGame(options)
 {
 	var optionDiv = document.getElementById("options");
 
+	seed = null;
 	gameScore = 0;
 
 	if (options) {
@@ -1363,7 +1414,7 @@ function doOptions(env, args)
 	var options = gameFunctions[funcGetOptions](mainenv, []);
 	var optionDiv = document.getElementById("options");
 
-	if (!options) {
+	if (!options || randomSequence.length > 0) {
 		startGame();
 	}
 
@@ -1504,7 +1555,18 @@ window.onload = function() {
 
 	compile(fetchFile("start.scm"));
 
-	chooseGame();
+	if (location.search.startsWith("?game=")) {
+		randomSequence = location.search.substr(6).split(",");
+		var type = randomSequence.shift();
+		var new_url = location.href.substr(0,
+			location.href.length - location.search.length);
+		history.pushState("", type, new_url);
+		scm_apply(mainenv, ["__game-options",
+			["quote",type+".scm"],
+			["quote",type]]);
+	} else {
+		chooseGame();
+	}
 };
 
 window.applicationCache.addEventListener("error", function(e) {
