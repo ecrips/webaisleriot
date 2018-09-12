@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.9";
+var version = "v0.10";
 
 var debug_text = '';
 
@@ -1567,13 +1567,15 @@ window.onload = function() {
 	} else {
 		chooseGame();
 	}
+
+	window.onhashchange = hash_change;
 };
 
 window.applicationCache.addEventListener("error", function(e) {
 	setTextContent(document.getElementById("status"), "Failed to update offline cache");
 });
 
-window.onhashchange = function() {
+function hash_change() {
 	console.log("onhashchange",location.hash);
 	if (location.hash != "#ingame") {
 		doUndo();
