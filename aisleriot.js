@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.11";
+var version = "v0.12";
 
 var debug_text = '';
 
@@ -934,6 +934,11 @@ var mainenv = {
 	},
 	"cdr": function(env, args) {
 		var list = scm_apply(env, args[0]);
+		if (list.length == 0) {
+			d("Attempt to 'cdr' an empty list");
+			d(args);
+			die();
+		}
 		return list.slice(1);
 	},
 	"caar": function(env, args) {
@@ -998,10 +1003,27 @@ var mainenv = {
 		var pos = scm_apply(env, args[1]);
 		return list[pos];
 	},
+	"list-head": function(env, args) {
+		var list = scm_apply(env, args[0]);
+		var pos = scm_apply(env, args[1]);
+		if(pos <= list.length && pos >= 0) {
+			return list.slice(0,pos);
+		} else {
+			d("List-head length not within list length");
+			d(args);
+			die();
+		}
+	},
 	"list-tail": function(env, args) {
 		var list = scm_apply(env, args[0]);
 		var pos = scm_apply(env, args[1]);
-		return list.slice(pos);
+		if(pos <= list.length && pos >= 0) {
+			return list.slice(pos);
+		} else {
+			d("List-tail length not within list length");
+			d(args);
+			die();
+		}
 	},
 	"member": function(env, args) {
 		var item = scm_apply(env, args[0]);
@@ -1037,9 +1059,18 @@ var mainenv = {
 	"#f": false,
 	"#t": true,
 
+	"object->string": function(env,args) {
+		var text = scm_eval(env, args);
+		text = JSON.stringify(text);
+		return text;
+	},
 	"display": function(env, args) {
 		var text = scm_eval(env, args);
 		d(text);
+	},
+	"newline": function(env,args) {
+		d("");
+		return
 	},
 	"defmacro": function(env, args) {
 		var name = args[0];
@@ -1224,9 +1255,11 @@ function fetchFile(name)
 	return request.responseText;
 }
 
+
 function parse(text)
 {
 	var inComment = false;
+	var inBlockComment = false;
 	var inString = false;
 
 	var globallist = [];
@@ -1255,17 +1288,34 @@ function parse(text)
 				cursymbol += ch;
 			}
 			continue;
-		} else if (inComment) {
-			if (ch == "\n") {
+		}
+		
+		if (inComment) {
+			if (ch == "\n" ) {
 				inComment = false;
 			}
-			continue;
+			continue
+		}
+		
+		if (inBlockComment) {
+			if ( ch == "!" && text.charAt(c+1) == "#") {
+				inBlockComment = false;
+				c=c+2;
+			}
+			continue
 		}
 
 		if (ch == ";") {
 			inComment = true;
-			ch = " ";
+			c++;
+			continue
 		}
+		if (ch == "#" && text.charAt(c+1) == "!") {
+			inBlockComment = true;
+			c=c+2;
+			continue
+		}
+		
 		if (ch == "\n" || ch == "\t" || ch == " ") {
 			push_symbol();
 			curlist = stack[stack.length-1];
