@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.12";
+var version = "v0.13";
 
 var debug_text = '';
 
@@ -1070,7 +1070,7 @@ var mainenv = {
 	},
 	"newline": function(env,args) {
 		d("");
-		return
+		return;
 	},
 	"defmacro": function(env, args) {
 		var name = args[0];
@@ -1121,9 +1121,13 @@ var mainenv = {
 		});
 		return items;
 	},
-	"format": function(env, args) {
+	"format": function(env, args) {				// always return a string
 		var format_string = scm_apply(env, args[0]);
 		var options = scm_eval(env, args.slice(1));
+		if (format_string == false) {				// ignore 1st arg if #f
+			format_string = scm_apply(env,args[1]);
+			options = scm_eval(env, args.slice(2));
+		}
 		var fstring = /~./;
 		var t;
 		var text = "";
@@ -1255,7 +1259,6 @@ function fetchFile(name)
 	return request.responseText;
 }
 
-
 function parse(text)
 {
 	var inComment = false;
@@ -1289,33 +1292,32 @@ function parse(text)
 			}
 			continue;
 		}
-		
+
 		if (inComment) {
-			if (ch == "\n" ) {
+			if (ch == "\n") {
 				inComment = false;
 			}
-			continue
+			continue;
 		}
-		
+
 		if (inBlockComment) {
 			if ( ch == "!" && text.charAt(c+1) == "#") {
 				inBlockComment = false;
-				c=c+2;
+				c++;
 			}
-			continue
+			continue;
 		}
 
 		if (ch == ";") {
 			inComment = true;
-			c++;
-			continue
+			ch = " ";
 		}
 		if (ch == "#" && text.charAt(c+1) == "!") {
 			inBlockComment = true;
-			c=c+2;
-			continue
+			c++;
+			ch = " ";
 		}
-		
+
 		if (ch == "\n" || ch == "\t" || ch == " ") {
 			push_symbol();
 			curlist = stack[stack.length-1];
