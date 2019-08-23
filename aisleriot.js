@@ -1121,9 +1121,13 @@ var mainenv = {
 		});
 		return items;
 	},
-	"format": function(env, args) {
+	"format": function(env, args) {				// always return a string
 		var format_string = scm_apply(env, args[0]);
 		var options = scm_eval(env, args.slice(1));
+		if (format_string == false) {				// ignore 1st arg if #f
+			format_string = scm_apply(env,args[1]);
+			options = scm_eval(env, args.slice(2));
+		}
 		var fstring = /~./;
 		var t;
 		var text = "";
