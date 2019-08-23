@@ -1122,8 +1122,12 @@ var mainenv = {
 		return items;
 	},
 	"format": function(env, args) {
-		var format_string = scm_apply(env, args[0]);
-		var options = scm_eval(env, args.slice(1));
+		var dest = scm_apply(env, args[0]);
+		if (dest != false) {
+			die("First argument (dest) must be '#f' in 'format'");
+		}
+		var format_string = scm_apply(env, args[1]);
+		var options = scm_eval(env, args.slice(2));
 		var fstring = /~./;
 		var t;
 		var text = "";
