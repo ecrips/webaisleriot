@@ -63,6 +63,13 @@ function d(text)
 		debug_text +"</pre>";
 }
 
+function d_raw(text)
+{
+	debug_text += text;
+	document.getElementById('debug').innerHTML = "<pre>"+
+		debug_text +"</pre>";
+}
+
 var funcNewGame = 0;
 var funcButtonPressed = 1;
 var funcButtonReleased = 2;
@@ -1066,10 +1073,10 @@ var mainenv = {
 	},
 	"display": function(env, args) {
 		var text = scm_eval(env, args);
-		d(text);
+		d_raw(text);
 	},
 	"newline": function(env,args) {
-		d("");
+		d_raw("");
 		return;
 	},
 	"defmacro": function(env, args) {
@@ -1270,6 +1277,11 @@ function parse(text)
 	var cursymbol = '';
 	var stack = [curlist];
 
+	var esc = {
+		"n": "\n", "a": "\u0007", "f": "\f", "r": "\r", "t": "\t",
+		"v": "\v", "b": "\b", "0": "\0", "\n": ""
+	};
+
 	function push_symbol() {
 		if (cursymbol != '') {
 			curlist.push(cursymbol);
@@ -1287,6 +1299,11 @@ function parse(text)
 				cursymbol = ["quote",cursymbol];
 				push_symbol();
 				inString = false;
+			} else if (ch == '\\') {
+				c++;
+				ch = text.charAt(c);
+				ch = esc[ch] || ch;
+				cursymbol += ch;
 			} else {
 				cursymbol += ch;
 			}
@@ -1392,7 +1409,7 @@ function scm_apply(env, statement)
 	if (typeof func == "function") {
 		return func(env, statement.slice(1));
 	} else {
-		d(["Attempted to apply",func]);
+		d(["Attempted to apply",func, statement]);
 		die(func+" not defined");
 	}
 }
@@ -1604,6 +1621,11 @@ window.onload = function() {
 
 	container = document.getElementById("container");
 	highlight = document.getElementById("highlight");
+
+	if (location.search == "?tests") {
+		compile(fetchFile("tests.scm"));
+		return;
+	}
 
 	compile(fetchFile("start.scm"));
 
