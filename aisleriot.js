@@ -1,6 +1,6 @@
 // Aisleriot card games in Javascript
 //
-// Copyright (C) 2011-2018  Steven Price
+// Copyright (C) 2011-2021  Steven Price
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -417,6 +417,7 @@ function buttonPressed(e, card, slotid, position)
 
 		function move(e) {
 			if (!e) e = event;
+			e.preventDefault();
 			if (e.touches) e=e.targetTouches[0];
 
 			for(var i=0; i<cardlist.length; i++) {
