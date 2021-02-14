@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.13";
+var version = "v0.14";
 
 var debug_text = '';
 
@@ -1644,6 +1644,13 @@ window.onload = function() {
 	}
 
 	window.onhashchange = hash_change;
+
+	window.addEventListener("keydown", function(e) {
+		if (e.key == "Backspace") {
+			doUndo();
+			e.preventDefault();
+		}
+	});
 };
 
 window.applicationCache.addEventListener("error", function(e) {
