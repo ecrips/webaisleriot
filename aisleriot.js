@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.14";
+var version = "v0.14-1-g7d08865";
 
 var debug_text = '';
 
@@ -335,6 +335,16 @@ function doNewGame()
 			if (result == "Yes") {
 				gameState = "running";
 				startGameLambda();
+			}
+		});
+}
+
+function doChangeGame()
+{
+	dialog("Choose a different game?", ["Yes", "No"],
+		function(result) {
+			if (result == "Yes") {
+				location.reload();
 			}
 		});
 }
@@ -1615,6 +1625,7 @@ function die(msg) {
 
 window.onload = function() {
 	document.getElementById("newgame").onclick = doNewGame;
+	document.getElementById("changegame").onclick = doChangeGame;
 	document.getElementById("deal").onclick = doDeal;
 	document.getElementById("undo").onclick = doUndo;
 	document.getElementById("redo").onclick = doRedo;
