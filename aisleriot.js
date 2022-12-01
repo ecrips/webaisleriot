@@ -1,6 +1,6 @@
 // Aisleriot card games in Javascript
 //
-// Copyright (C) 2011-2021  Steven Price
+// Copyright (C) 2011-2022  Steven Price
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.15";
+var version = "v0.16";
 
 var debug_text = '';
 
@@ -514,6 +514,9 @@ function buttonPressed(e, card, slotid, position)
 		container.addEventListener("mousemove", move);
 		container.addEventListener("touchend", up);
 		container.addEventListener("mouseup", up);
+		if (container.setPointerCapture)
+			container.setPointerCapture(e.pointerId);
+		e.preventDefault();
 		return false;
 	}
 	return true;
