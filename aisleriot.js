@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.16";
+var version = "v0.17";
 
 var debug_text = '';
 
@@ -465,8 +465,13 @@ function buttonPressed(e, card, slotid, position)
 
 			container.removeEventListener("touchmove", move);
 			container.removeEventListener("touchend", up);
-			container.removeEventListener("mousemove", move);
-			container.removeEventListener("mouseup", up);
+			if (container.setPointerCapture) {
+				container.removeEventListener("pointermove", move);
+				container.removeEventListener("pointerup", up);
+			} else {
+				container.removeEventListener("mousemove", move);
+				container.removeEventListener("mouseup", up);
+			}
 
 			hideHighlight();
 
@@ -511,11 +516,16 @@ function buttonPressed(e, card, slotid, position)
 			}
 		}
 		container.addEventListener("touchmove", move);
-		container.addEventListener("mousemove", move);
 		container.addEventListener("touchend", up);
-		container.addEventListener("mouseup", up);
-		if (container.setPointerCapture)
-			container.setPointerCapture(e.pointerId);
+		if (container.setPointerCapture) {
+			container.addEventListener("pointermove", move);
+			container.addEventListener("pointerup", up);
+			if (e.pointerId !== undefined)
+				container.setPointerCapture(e.pointerId);
+		} else {
+			container.addEventListener("mousemove", move);
+			container.addEventListener("mouseup", up);
+		}
 		e.preventDefault();
 		return false;
 	}
@@ -531,7 +541,10 @@ function makeCard(details, slotid, position)
 		if (!ev) ev = event;
 		return buttonPressed(ev, e, slotid, position);
 	};
-	e.addEventListener("mousedown", down);
+	if (container.setPointerCapture)
+		e.addEventListener("pointerdown", down);
+	else
+		e.addEventListener("mousedown", down);
 	e.addEventListener("touchstart", down);
 	e.onclick = function(env) {
 		scm_apply(mainenv, ["record-move",
