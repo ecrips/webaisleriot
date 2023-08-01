@@ -1,6 +1,6 @@
 // Aisleriot card games in Javascript
 //
-// Copyright (C) 2011-2022  Steven Price
+// Copyright (C) 2011-2023  Steven Price
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 (function(){
 "use strict";
 
-var version = "v0.17";
+var version = "v0.18";
 
 var debug_text = '';
 
@@ -1533,10 +1533,10 @@ function doOptions(env, args)
 			continue;
 		}
 		var d = document.createElement("div");
-		var text = document.createElement("span");
+		let text = document.createElement("label");
 		setTextContent(text, op[0]);
 		d.appendChild(text);
-		var value = document.createElement("input");
+		let value = document.createElement("input");
 		if (radio) {
 			value.type = "radio";
 			value.name = "radio"+radiocount;
@@ -1544,7 +1544,7 @@ function doOptions(env, args)
 			value.type = "checkbox";
 		}
 		value.checked = truth(op[1]);
-		d.appendChild(value);
+		text.appendChild(value);
 
 		optionDiv.appendChild(d);
 
