@@ -13,7 +13,7 @@ cache.manifest: ${FILES} Makefile
 	mv cache.new cache.manifest
 
 apple-touch-icon.png: icon.svg
-	inkscape -e $@ $<
+	inkscape -o $@ $<
 
 %.tar.gz: $(FILES) *.svg Makefile
 	tar -czf $@ $+
