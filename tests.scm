@@ -150,5 +150,8 @@
 (test "bug-member-nested" '((1) (2)) (member '(1) '((1) (2))))
 (test "bug-member-coercion" #f (member 0 '(#f 1 2)))
 
+;; 5. (and) should return #t
+(test "bug-and-empty" #t (and))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))

@@ -779,7 +779,7 @@ var mainenv = {
 		return !truth(value);
 	},
 	"and": function(env, args) {
-		var val;
+		var val = true;
 		for(var i = 0; i < args.length; i++) {
 			val = scm_apply(env, args[i]);
 			if (!truth(val)) {
