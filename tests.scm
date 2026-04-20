@@ -26,5 +26,17 @@
 
 (test "quote" 1 '1)
 
+;;; Arithmetic
+(test "add" 6 (+ 1 2 3))
+(test "sub" 2 (- 5 2 1))
+(test "mul" 24 (* 2 3 4))
+(test "div" 2 (/ 12 3 2))
+(test "quotient" 3 (quotient 10 3))
+(test "modulo" 1 (modulo 10 3))
+(test "max" 5 (max 1 5 3 2))
+(test "min" 1 (min 1 5 3 2))
+(test "expt" 8 (expt 2 3))
+(test "integer-expt" 8 (integer-expt 2 3))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))

@@ -709,9 +709,9 @@ var mainenv = {
 	},
 	"quotient": function(env, args) {
 		args = scm_eval(env, args);
-		var out = parseInt(args[0]);
+		var out = Math.trunc(args[0]);
 		for(var i = 1; i < args.length; i++) {
-			out /= parseInt(args[i]);
+			out = Math.trunc(out / Math.trunc(args[i]));
 		}
 		return out;
 	},
