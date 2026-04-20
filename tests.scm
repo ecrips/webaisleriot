@@ -12,6 +12,13 @@
 
 (test "equal1" #t (equal? "Foo" "Foo"))
 (test "equal2" #f (equal? "Foo" "Bar"))
+(test "equal3" #t (equal? '(1 2) '(1 2)))
+(test "equal4" #f (equal? '(1 2) '(1 3)))
+(test "equal5" #t (equal? '(1 2) (cons 1 '(2))))
+
+(test "eq1" #f (eq? '(1 2) (cons 1 '(2))))
+(test "eq2" #f (eq? '(1 2) '(1 3)))
+(let ((n '(1 2))) (test "eq3" #t (eq? n n)))
 
 (test "format1" "Foo" (format #f "Foo"))
 (begin
@@ -138,6 +145,10 @@
 (test "bug-map-list-elements" '((1) (2)) (map list '(1 2)))
 (define (my-id x) x)
 (test "bug-map-define-nested" '((1)) (map my-id '((1))))
+
+;; 4. Member should use value equality (equal?) and avoid JS coercion
+(test "bug-member-nested" '((1) (2)) (member '(1) '((1) (2))))
+(test "bug-member-coercion" #f (member 0 '(#f 1 2)))
 
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))

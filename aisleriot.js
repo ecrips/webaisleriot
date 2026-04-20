@@ -1063,8 +1063,9 @@ var mainenv = {
 	"member": function(env, args) {
 		var item = scm_apply(env, args[0]);
 		var list = scm_apply(env, args[1]);
+		item = JSON.stringify(item);
 		for(var i in list) {
-			if (list[i] == item) {
+			if (JSON.stringify(list[i]) == item) {
 				return list.slice(i);
 			}
 		}
