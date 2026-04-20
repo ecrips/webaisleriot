@@ -717,9 +717,10 @@ var mainenv = {
 	},
 	"modulo": function(env, args) {
 		args = scm_eval(env, args);
-		var arg1 = parseInt(args[0]);
-		var arg2 = parseInt(args[1]);
-		return arg1 % arg2;
+		var arg1 = args[0];
+		var arg2 = args[1];
+		/* modulo is Scheme is always positive */
+		return ((arg1 % arg2) + arg2) % arg2;
 	},
 	"max": function(env, args) {
 		args = scm_eval(env, args);

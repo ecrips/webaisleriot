@@ -127,5 +127,12 @@
   (define r (random 10))
   (test "random-range" #t (and (>= r 0) (< r 10))))
 
+;;; Targeted Bug Demonstrations
+;; 1. Quotient should return an integer
+(test "bug-quotient-int" 3 (quotient 10 3))
+
+;; 2. Modulo should follow the sign of the divisor
+(test "bug-modulo-neg" 2 (modulo -10 3))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
