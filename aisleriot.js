@@ -1310,7 +1310,11 @@ function parse(text)
 	};
 
 	function push_symbol() {
-		if (cursymbol != '') {
+		if (cursymbol == "") {
+		} else if (typeof(cursymbol) == "string" &&
+		    number_regexp.exec(cursymbol)) {
+			curlist.push(parseFloat(cursymbol))
+		} else {
 			curlist.push(cursymbol);
 		}
 		cursymbol = '';

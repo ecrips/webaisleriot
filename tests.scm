@@ -24,5 +24,7 @@
         (format #f "Foo ~a Bar ~a" (get-number) (get-number)))
   )
 
+(test "quote" 1 '1)
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
