@@ -164,5 +164,9 @@
 (test "float-max" 3.5 (max 1.2 3.5 2.8))
 (test "float-min" 1.2 (min 1.2 3.5 2.8))
 
+;; 2. cond 'else' and test-only clause
+(test "cond-else" 'else (cond (#f 'no) (else 'else)))
+(test "cond-test-only" 5 (cond (5)))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))

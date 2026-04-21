@@ -851,9 +851,16 @@ var mainenv = {
 	},
 	"cond": function(env, args) {
 		for(var i = 0; i < args.length; i++) {
-			var cond = scm_apply(env, args[i][0]);
+			var test = args[i][0];
+			var clause = args[i].slice(1);
+			if (test === "else") {
+				return scm_eval(env, clause).pop();
+			}
+			var cond = scm_apply(env, test);
 			if (truth(cond)) {
-				return scm_eval(env, args[i].slice(1)).pop();
+				if (clause.length == 0)
+					return cond;
+				return scm_eval(env, clause).pop();
 			}
 		}
 	},

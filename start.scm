@@ -50,9 +50,6 @@
 (define (vector->list x) x)
 (define (list->vector x) x)
 
-; Else is the same as true when used in cond
-(define else #t)
-
 ; These are just getting stupidly long
 (define (cdaadr x) (cdaar (cdr x)))
 (define (cadadr x) (cadar (cdr x)))
