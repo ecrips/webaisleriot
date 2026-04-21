@@ -724,49 +724,49 @@ var mainenv = {
 	},
 	"max": function(env, args) {
 		args = scm_eval(env, args);
-		var out = parseInt(args[0]);
+		var out = args[0];
 		for(var i = 1; i < args.length; i++) {
-			var num = parseInt(args[i]);
+			var num = args[i];
 			if (num > out) out = num;
 		}
 		return out;
 	},
 	"min": function(env, args) {
 		args = scm_eval(env, args);
-		var out = parseInt(args[0]);
+		var out = args[0];
 		for(var i = 1; i < args.length; i++) {
-			var num = parseInt(args[i]);
+			var num = args[i];
 			if (num < out) out = num;
 		}
 		return out;
 	},
 	"expt": function(env, args) {
 		args = scm_eval(env, args);
-		return Math.pow(parseInt(args[0]), parseInt(args[1]));
+		return Math.pow(args[0], args[1]);
 	},
 	"=": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (parseInt(args[0]) == parseInt(args[1]));
+		var ret = (args[0] == args[1]);
 		return ret;
 	},
 	">": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (parseInt(args[0]) > parseInt(args[1]));
+		var ret = (args[0] > args[1]);
 		return ret;
 	},
 	">=": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (parseInt(args[0]) >= parseInt(args[1]));
+		var ret = (args[0] >= args[1]);
 		return ret;
 	},
 	"<=": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (parseInt(args[0]) <= parseInt(args[1]));
+		var ret = (args[0] <= args[1]);
 		return ret;
 	},
 	"<": function(env, args) {
 		args = scm_eval(env, args);
-		var ret = (parseInt(args[0]) < parseInt(args[1]));
+		var ret = (args[0] < args[1]);
 		return ret;
 	},
 	"string<?": function(env, args) {

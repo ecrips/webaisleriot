@@ -156,5 +156,13 @@
 ;; 6. Apply should support more than 2 arguments (Standard Scheme)
 (test "bug-apply-multiple" 10 (apply + 1 2 3 '(4)))
 
+;;; Second Round Bug Fixes
+;; 1. Float comparisons and math
+(test "float-equal1" #t (= 1.5 1.5))
+(test "float-equal2" #f (= 1 1.5))
+(test "float-greater" #t (> 2.5 1.5))
+(test "float-max" 3.5 (max 1.2 3.5 2.8))
+(test "float-min" 1.2 (min 1.2 3.5 2.8))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
