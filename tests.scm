@@ -168,5 +168,12 @@
 (test "cond-else" 'else (cond (#f 'no) (else 'else)))
 (test "cond-test-only" 5 (cond (5)))
 
+;; 3. Named let scoping and recursion
+(test "named-let-scoping" 120
+      (let fact ((n 5) (acc 1))
+        (if (= n 0)
+            acc
+            (fact (- n 1) (* n acc)))))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
