@@ -830,10 +830,15 @@ var mainenv = {
 		return args[0];
 	},
 	"apply": function(env, args) {
-		var optional_args = scm_apply(env, args[1]);
-		args = [args[0]].concat(optional_args);
-		var ret = scm_apply(env, args);
-		return ret;
+		var func_args = [args[0]];
+		for (var i = 1; i < args.length; i++) {
+			func_args.push(scm_apply(env, args[i]));
+		}
+		// Last argument should evaluate to a list which is concatenated
+		var last_arg = func_args.pop();
+		func_args = func_args.concat(last_arg);
+
+		return scm_apply(env, func_args);
 	},
 	"if": function(env, args) {
 		var cond = scm_apply(env, args[0]);

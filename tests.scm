@@ -153,5 +153,8 @@
 ;; 5. (and) should return #t
 (test "bug-and-empty" #t (and))
 
+;; 6. Apply should support more than 2 arguments (Standard Scheme)
+(test "bug-apply-multiple" 10 (apply + 1 2 3 '(4)))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
