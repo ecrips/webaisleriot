@@ -1009,7 +1009,7 @@ var mainenv = {
 		return list[0][0].slice(1);
 	},
 	"map": function(env, args) {
-		if (args.length > 2) {
+		if (args.length != 2) {
 			d("map doesn't support more than one list");
 			die();
 		}
@@ -1017,7 +1017,7 @@ var mainenv = {
 		var list = scm_apply(env, args[1]);
 		var output = [];
 		for(var i = 0; i < list.length; i++) {
-			output.push(func(env, [list[i]]));
+			output.push(func(env, [["quote", list[i]]]));
 		}
 		return output;
 	},

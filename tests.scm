@@ -134,5 +134,10 @@
 ;; 2. Modulo should follow the sign of the divisor
 (test "bug-modulo-neg" 2 (modulo -10 3))
 
+;; 3. Map should handle lists of lists without evaluating elements
+(test "bug-map-list-elements" '((1) (2)) (map list '(1 2)))
+(define (my-id x) x)
+(test "bug-map-define-nested" '((1)) (map my-id '((1))))
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
