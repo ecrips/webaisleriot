@@ -1,11 +1,16 @@
-FILES=*.js *.scm *.png *.html
+FILES=$(filter-out sw.js,$(wildcard *.js)) $(wildcard *.scm *.png *.html)
 
 VERSION=$(shell ./mkversion)
 
-all: cache.manifest apple-touch-icon.png
+all: sw.js cache.manifest apple-touch-icon.png
 	@echo $(VERSION)
 
 dist: webaisleriot-$(VERSION).tar.gz
+
+sw.js: ${FILES} Makefile sw.js.in
+	ls ${FILES} | sed "s/.*/  '.\/&',/" > assets.tmp
+	sed -e "s/@VERSION@/$(VERSION)/" -e "/@ASSET_LIST@/r assets.tmp" -e "/@ASSET_LIST@/d" sw.js.in > sw.js
+	rm assets.tmp
 
 cache.manifest: ${FILES} Makefile
 	echo CACHE MANIFEST > cache.new
@@ -17,3 +22,6 @@ apple-touch-icon.png: icon.svg
 
 %.tar.gz: $(FILES) *.svg Makefile
 	tar -czf $@ $+
+
+clean:
+	rm -f sw.js assets.tmp cache.manifest

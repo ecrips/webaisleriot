@@ -1,3 +1,5 @@
 *.swp
 original
 cache.manifest
+sw.js
+apple-touch-icon.png
