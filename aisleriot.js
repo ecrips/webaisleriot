@@ -1176,7 +1176,11 @@ var mainenv = {
 
 		items = items.slice(0);
 		items.sort(function(b,a) {
-			return less(env, [["quote",a],["quote",b]]);
+			if (less(env, [["quote",a],["quote",b]]))
+				return 1;
+			if (less(env, [["quote",b],["quote",a]]))
+				return -1;
+			return 0;
 		});
 		return items;
 	},
