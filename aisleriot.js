@@ -950,6 +950,18 @@ var mainenv = {
 		
 		return scm_eval(newenv, stmts).pop();
 	},
+	"vector": function(env, args) {
+		var ret = scm_eval(env, args);
+		return ret;
+	},
+	"vector->list": function(env, args) {
+		var ret = scm_apply(env, args[0]);
+		return ret.slice(0);
+	},
+	"list->vector": function(env, args) {
+		var ret = scm_apply(env, args[0]);
+		return ret.slice(0);
+	},
 	"vector-length": function(env, args) {
 		var vector = scm_apply(env, args[0]);
 		return vector.length;

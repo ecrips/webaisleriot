@@ -45,11 +45,6 @@
                      (and-map pred (cdr list))
 )))
 
-; We treat vectors the same as lists
-(define vector list)
-(define (vector->list x) x)
-(define (list->vector x) x)
-
 ; These are just getting stupidly long
 (define (cdaadr x) (cdaar (cdr x)))
 (define (cadadr x) (cadar (cdr x)))

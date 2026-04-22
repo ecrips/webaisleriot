@@ -175,5 +175,13 @@
             acc
             (fact (- n 1) (* n acc)))))
 
+;;; Vector tests
+(test "vector-length1" 3 (vector-length (vector 1 2 3)))
+(test "vector-length2" 5 (vector-length (list->vector (list 5 5 1 2 3))))
+(test "vector-should-copy" '(1 2 3) (let ((l '(1 2 3)))
+                                      (vector-set! (list->vector l) 1 100)
+                                      l))
+
+
 (display (format #f "Passed: ~a Failed: ~a\n" passed failed))
 (if (> failed 0) (display "Some tests failed\n") (display "All tests passed\n"))
