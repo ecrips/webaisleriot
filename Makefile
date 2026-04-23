@@ -5,8 +5,6 @@ VERSION=$(shell ./mkversion)
 all: sw.js cache.manifest apple-touch-icon.png
 	@echo $(VERSION)
 
-dist: webaisleriot-$(VERSION).tar.gz
-
 sw.js: ${FILES} Makefile sw.js.in
 	ls ${FILES} | sed "s/.*/  '.\/&',/" > assets.tmp
 	sed -e "s/@VERSION@/$(VERSION)/" -e "/@ASSET_LIST@/r assets.tmp" -e "/@ASSET_LIST@/d" sw.js.in > sw.js
@@ -19,9 +17,6 @@ cache.manifest: ${FILES} Makefile
 
 apple-touch-icon.png: icon.svg
 	inkscape -o $@ $<
-
-%.tar.gz: $(FILES) *.svg Makefile
-	tar -czf $@ $+
 
 clean:
 	rm -f sw.js assets.tmp cache.manifest
