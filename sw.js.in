@@ -7,7 +7,13 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return Promise.all(
+	ASSETS.map(async (url) => {
+	  const request = new Request(url, { cache: 'reload' });
+	  const response = await fetch(request);
+	  await cache.put(request, response);
+	})
+      );
     })
   );
   self.skipWaiting();
