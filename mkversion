@@ -1,6 +1,16 @@
 #!/bin/bash
 
+tmp=mktemp
+
+CLEANVER=`git diff -- aisleriot.js | grep -- "-var version" | sed "s/.*\"\(.*\)\".*/\\1/"`
+sed 's/\(var version = "\).*"/\1'"$CLEANVER"'"/' < aisleriot.js > $tmp
+cp $tmp aisleriot.js
+rm $tmp
+
 if [[ "a$1" != "a" ]]; then
+	if [[ "$1" == "clean" ]]; then
+		exit
+	fi
 	VERSION=$1
 else
 	VERSION=`git describe --dirty`
@@ -11,8 +21,6 @@ if [[ "$CURVER" == "$VERSION" ]]; then
 	echo $VERSION
 	exit
 fi
-
-tmp=mktemp
 
 sed 's/\(var version = "\).*"/\1'"$VERSION"'"/' < aisleriot.js > $tmp
 cp $tmp aisleriot.js
